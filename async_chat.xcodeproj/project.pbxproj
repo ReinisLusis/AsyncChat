@@ -1,0 +1,305 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		93898AEC1BEE40260049D1DC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93898AEB1BEE40260049D1DC /* main.cpp */; };
+		93EB5EF21BEE4CC800B3A2C2 /* libboost_system.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EB5EF11BEE4CC800B3A2C2 /* libboost_system.dylib */; };
+		93EB5EF41BEE577F00B3A2C2 /* libboost_program_options.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EB5EF31BEE577F00B3A2C2 /* libboost_program_options.dylib */; };
+		93EB5EF61BEF84F300B3A2C2 /* libboost_serialization.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EB5EF51BEF84F300B3A2C2 /* libboost_serialization.dylib */; };
+		93EB5F051BEFD0AC00B3A2C2 /* chat_data_packet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F031BEFD0AC00B3A2C2 /* chat_data_packet.cpp */; settings = {ASSET_TAGS = (); }; };
+		93EB5F071BEFD29700B3A2C2 /* chat_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F061BEFD29700B3A2C2 /* chat_server.cpp */; settings = {ASSET_TAGS = (); }; };
+		93EB5F091BEFD46400B3A2C2 /* chat_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F081BEFD46400B3A2C2 /* chat_connection.cpp */; settings = {ASSET_TAGS = (); }; };
+		93EB5F0B1BEFD78000B3A2C2 /* input_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F0A1BEFD78000B3A2C2 /* input_handler.cpp */; settings = {ASSET_TAGS = (); }; };
+		93EB5F0E1BEFD8DE00B3A2C2 /* libcryptopp.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EB5F0C1BEFD86100B3A2C2 /* libcryptopp.so */; };
+		93EB5F101BEFD90E00B3A2C2 /* chat_message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F0F1BEFD90E00B3A2C2 /* chat_message.cpp */; settings = {ASSET_TAGS = (); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		93898AE61BEE40260049D1DC /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		93898AE81BEE40260049D1DC /* async_chat */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = async_chat; sourceTree = BUILT_PRODUCTS_DIR; };
+		93898AEB1BEE40260049D1DC /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		93EB5EF11BEE4CC800B3A2C2 /* libboost_system.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_system.dylib; path = ../../../../../usr/local/lib/libboost_system.dylib; sourceTree = "<group>"; };
+		93EB5EF31BEE577F00B3A2C2 /* libboost_program_options.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_program_options.dylib; path = ../../../../../usr/local/lib/libboost_program_options.dylib; sourceTree = "<group>"; };
+		93EB5EF51BEF84F300B3A2C2 /* libboost_serialization.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_serialization.dylib; path = ../../../../../usr/local/lib/libboost_serialization.dylib; sourceTree = "<group>"; };
+		93EB5EF81BEFCB4600B3A2C2 /* chat_message.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_message.h; sourceTree = "<group>"; };
+		93EB5EF91BEFCBB300B3A2C2 /* chat_message_client_notice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_message_client_notice.h; sourceTree = "<group>"; };
+		93EB5EFA1BEFCBE000B3A2C2 /* chat_message_text.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_message_text.h; sourceTree = "<group>"; };
+		93EB5EFB1BEFCC0E00B3A2C2 /* chat_message_text2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_message_text2.h; sourceTree = "<group>"; };
+		93EB5EFC1BEFCC7400B3A2C2 /* chat_data_packet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_data_packet.h; sourceTree = "<group>"; };
+		93EB5EFD1BEFCCC200B3A2C2 /* chat_client_controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_client_controller.h; sourceTree = "<group>"; };
+		93EB5EFE1BEFCCEE00B3A2C2 /* chat_connection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_connection.h; sourceTree = "<group>"; };
+		93EB5EFF1BEFCD2000B3A2C2 /* chat_server_connection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_server_connection.h; sourceTree = "<group>"; };
+		93EB5F001BEFCD4100B3A2C2 /* chat_client_connection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_client_connection.h; sourceTree = "<group>"; };
+		93EB5F011BEFCD7700B3A2C2 /* input_handler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = input_handler.h; sourceTree = "<group>"; };
+		93EB5F021BEFCDFA00B3A2C2 /* chat_server.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = chat_server.h; sourceTree = "<group>"; };
+		93EB5F031BEFD0AC00B3A2C2 /* chat_data_packet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_data_packet.cpp; sourceTree = "<group>"; };
+		93EB5F061BEFD29700B3A2C2 /* chat_server.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_server.cpp; sourceTree = "<group>"; };
+		93EB5F081BEFD46400B3A2C2 /* chat_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_connection.cpp; sourceTree = "<group>"; };
+		93EB5F0A1BEFD78000B3A2C2 /* input_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input_handler.cpp; sourceTree = "<group>"; };
+		93EB5F0C1BEFD86100B3A2C2 /* libcryptopp.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcryptopp.so; path = ../../../../../usr/local/lib/libcryptopp.so; sourceTree = "<group>"; };
+		93EB5F0F1BEFD90E00B3A2C2 /* chat_message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_message.cpp; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		93898AE51BEE40260049D1DC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93EB5F0E1BEFD8DE00B3A2C2 /* libcryptopp.so in Frameworks */,
+				93EB5EF61BEF84F300B3A2C2 /* libboost_serialization.dylib in Frameworks */,
+				93EB5EF41BEE577F00B3A2C2 /* libboost_program_options.dylib in Frameworks */,
+				93EB5EF21BEE4CC800B3A2C2 /* libboost_system.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		93898ADF1BEE40260049D1DC = {
+			isa = PBXGroup;
+			children = (
+				93EB5F0C1BEFD86100B3A2C2 /* libcryptopp.so */,
+				93EB5EF51BEF84F300B3A2C2 /* libboost_serialization.dylib */,
+				93EB5EF31BEE577F00B3A2C2 /* libboost_program_options.dylib */,
+				93EB5EF11BEE4CC800B3A2C2 /* libboost_system.dylib */,
+				93898AEA1BEE40260049D1DC /* async_chat */,
+				93898AE91BEE40260049D1DC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		93898AE91BEE40260049D1DC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				93898AE81BEE40260049D1DC /* async_chat */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		93898AEA1BEE40260049D1DC /* async_chat */ = {
+			isa = PBXGroup;
+			children = (
+				93898AEB1BEE40260049D1DC /* main.cpp */,
+				93EB5EF81BEFCB4600B3A2C2 /* chat_message.h */,
+				93EB5EF91BEFCBB300B3A2C2 /* chat_message_client_notice.h */,
+				93EB5EFA1BEFCBE000B3A2C2 /* chat_message_text.h */,
+				93EB5EFB1BEFCC0E00B3A2C2 /* chat_message_text2.h */,
+				93EB5EFC1BEFCC7400B3A2C2 /* chat_data_packet.h */,
+				93EB5EFD1BEFCCC200B3A2C2 /* chat_client_controller.h */,
+				93EB5EFE1BEFCCEE00B3A2C2 /* chat_connection.h */,
+				93EB5EFF1BEFCD2000B3A2C2 /* chat_server_connection.h */,
+				93EB5F001BEFCD4100B3A2C2 /* chat_client_connection.h */,
+				93EB5F011BEFCD7700B3A2C2 /* input_handler.h */,
+				93EB5F021BEFCDFA00B3A2C2 /* chat_server.h */,
+				93EB5F031BEFD0AC00B3A2C2 /* chat_data_packet.cpp */,
+				93EB5F061BEFD29700B3A2C2 /* chat_server.cpp */,
+				93EB5F081BEFD46400B3A2C2 /* chat_connection.cpp */,
+				93EB5F0A1BEFD78000B3A2C2 /* input_handler.cpp */,
+				93EB5F0F1BEFD90E00B3A2C2 /* chat_message.cpp */,
+			);
+			path = async_chat;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		93898AE71BEE40260049D1DC /* async_chat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 93898AEF1BEE40260049D1DC /* Build configuration list for PBXNativeTarget "async_chat" */;
+			buildPhases = (
+				93898AE41BEE40260049D1DC /* Sources */,
+				93898AE51BEE40260049D1DC /* Frameworks */,
+				93898AE61BEE40260049D1DC /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = async_chat;
+			productName = async_chat;
+			productReference = 93898AE81BEE40260049D1DC /* async_chat */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		93898AE01BEE40260049D1DC /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = Reinis;
+				TargetAttributes = {
+					93898AE71BEE40260049D1DC = {
+						CreatedOnToolsVersion = 7.0.1;
+					};
+				};
+			};
+			buildConfigurationList = 93898AE31BEE40260049D1DC /* Build configuration list for PBXProject "async_chat" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 93898ADF1BEE40260049D1DC;
+			productRefGroup = 93898AE91BEE40260049D1DC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				93898AE71BEE40260049D1DC /* async_chat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		93898AE41BEE40260049D1DC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				93898AEC1BEE40260049D1DC /* main.cpp in Sources */,
+				93EB5F0B1BEFD78000B3A2C2 /* input_handler.cpp in Sources */,
+				93EB5F051BEFD0AC00B3A2C2 /* chat_data_packet.cpp in Sources */,
+				93EB5F101BEFD90E00B3A2C2 /* chat_message.cpp in Sources */,
+				93EB5F071BEFD29700B3A2C2 /* chat_server.cpp in Sources */,
+				93EB5F091BEFD46400B3A2C2 /* chat_connection.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		93898AED1BEE40260049D1DC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		93898AEE1BEE40260049D1DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = /usr/local/include;
+				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		93898AF01BEE40260049D1DC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		93898AF11BEE40260049D1DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		93898AE31BEE40260049D1DC /* Build configuration list for PBXProject "async_chat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				93898AED1BEE40260049D1DC /* Debug */,
+				93898AEE1BEE40260049D1DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		93898AEF1BEE40260049D1DC /* Build configuration list for PBXNativeTarget "async_chat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				93898AF01BEE40260049D1DC /* Debug */,
+				93898AF11BEE40260049D1DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 93898AE01BEE40260049D1DC /* Project object */;
+}
