@@ -16,15 +16,15 @@ class chat_message_client_notice : public chat_message
 public:
     enum class NoticeTypeEnum { Connected, Disconnected };
     
-    chat_message_client_notice(const NoticeTypeEnum & noticeType, const std::string & name) : notice_type_(noticeType), name_(name) {}
+    chat_message_client_notice(const NoticeTypeEnum & noticeType, const std::string & name);
     
-    NoticeTypeEnum NoticeType() const { return notice_type_; };
+    NoticeTypeEnum NoticeType() const;
     
-    const std::string & Name() const { return name_; }
+    const std::string & Name() const;
     
-    virtual ~chat_message_client_notice() {}
+    virtual ~chat_message_client_notice();
 protected:
-    chat_message_client_notice() {}
+    chat_message_client_notice();
     
     NoticeTypeEnum notice_type_;
     std::string name_;
@@ -32,14 +32,7 @@ protected:
 private:
     friend class boost::serialization::access;
     template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & boost::serialization::base_object<chat_message>(*this);
-        ar & notice_type_;
-        ar & name_;
-    }
+    void serialize(Archive & ar, const unsigned int version);
 };
-BOOST_CLASS_VERSION(chat_message_client_notice, 0)
-BOOST_CLASS_EXPORT_GUID(chat_message_client_notice, "e466249933824d6189848eb760904f3f")
 
 #endif /* chat_message_client_notice_h */

@@ -27,7 +27,7 @@ public:
     
     void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
-    void ClientError(std::shared_ptr<chat_connection> client, const std::string & name)override;
+    void ClientError(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
     void TimerExpired(std::shared_ptr<chat_connection> client, const std::string & name) override;
     

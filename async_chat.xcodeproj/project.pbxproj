@@ -17,6 +17,11 @@
 		93EB5F0B1BEFD78000B3A2C2 /* input_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F0A1BEFD78000B3A2C2 /* input_handler.cpp */; settings = {ASSET_TAGS = (); }; };
 		93EB5F0E1BEFD8DE00B3A2C2 /* libcryptopp.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EB5F0C1BEFD86100B3A2C2 /* libcryptopp.so */; };
 		93EB5F101BEFD90E00B3A2C2 /* chat_message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F0F1BEFD90E00B3A2C2 /* chat_message.cpp */; settings = {ASSET_TAGS = (); }; };
+		93FA07441BF0FBAB00DF5111 /* chat_message_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07431BF0FBAB00DF5111 /* chat_message_text.cpp */; settings = {ASSET_TAGS = (); }; };
+		93FA07461BF0FD2000DF5111 /* chat_message_text2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07451BF0FD2000DF5111 /* chat_message_text2.cpp */; settings = {ASSET_TAGS = (); }; };
+		93FA07481BF0FD8700DF5111 /* chat_message_client_notice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07471BF0FD8700DF5111 /* chat_message_client_notice.cpp */; settings = {ASSET_TAGS = (); }; };
+		93FA074A1BF0FE1200DF5111 /* chat_server_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07491BF0FE1200DF5111 /* chat_server_connection.cpp */; settings = {ASSET_TAGS = (); }; };
+		93FA074C1BF0FE9300DF5111 /* chat_client_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA074B1BF0FE9300DF5111 /* chat_client_connection.cpp */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,6 +59,11 @@
 		93EB5F0A1BEFD78000B3A2C2 /* input_handler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input_handler.cpp; sourceTree = "<group>"; };
 		93EB5F0C1BEFD86100B3A2C2 /* libcryptopp.so */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcryptopp.so; path = ../../../../../usr/local/lib/libcryptopp.so; sourceTree = "<group>"; };
 		93EB5F0F1BEFD90E00B3A2C2 /* chat_message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_message.cpp; sourceTree = "<group>"; };
+		93FA07431BF0FBAB00DF5111 /* chat_message_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_message_text.cpp; sourceTree = "<group>"; };
+		93FA07451BF0FD2000DF5111 /* chat_message_text2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_message_text2.cpp; sourceTree = "<group>"; };
+		93FA07471BF0FD8700DF5111 /* chat_message_client_notice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_message_client_notice.cpp; sourceTree = "<group>"; };
+		93FA07491BF0FE1200DF5111 /* chat_server_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_server_connection.cpp; sourceTree = "<group>"; };
+		93FA074B1BF0FE9300DF5111 /* chat_client_connection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chat_client_connection.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +121,11 @@
 				93EB5F081BEFD46400B3A2C2 /* chat_connection.cpp */,
 				93EB5F0A1BEFD78000B3A2C2 /* input_handler.cpp */,
 				93EB5F0F1BEFD90E00B3A2C2 /* chat_message.cpp */,
+				93FA07431BF0FBAB00DF5111 /* chat_message_text.cpp */,
+				93FA07451BF0FD2000DF5111 /* chat_message_text2.cpp */,
+				93FA07471BF0FD8700DF5111 /* chat_message_client_notice.cpp */,
+				93FA07491BF0FE1200DF5111 /* chat_server_connection.cpp */,
+				93FA074B1BF0FE9300DF5111 /* chat_client_connection.cpp */,
 			);
 			path = async_chat;
 			sourceTree = "<group>";
@@ -171,9 +186,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93FA07441BF0FBAB00DF5111 /* chat_message_text.cpp in Sources */,
+				93FA07461BF0FD2000DF5111 /* chat_message_text2.cpp in Sources */,
 				93898AEC1BEE40260049D1DC /* main.cpp in Sources */,
 				93EB5F0B1BEFD78000B3A2C2 /* input_handler.cpp in Sources */,
 				93EB5F051BEFD0AC00B3A2C2 /* chat_data_packet.cpp in Sources */,
+				93FA07481BF0FD8700DF5111 /* chat_message_client_notice.cpp in Sources */,
+				93FA074C1BF0FE9300DF5111 /* chat_client_connection.cpp in Sources */,
+				93FA074A1BF0FE1200DF5111 /* chat_server_connection.cpp in Sources */,
 				93EB5F101BEFD90E00B3A2C2 /* chat_message.cpp in Sources */,
 				93EB5F071BEFD29700B3A2C2 /* chat_server.cpp in Sources */,
 				93EB5F091BEFD46400B3A2C2 /* chat_connection.cpp in Sources */,
