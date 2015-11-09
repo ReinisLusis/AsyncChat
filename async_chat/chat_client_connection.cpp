@@ -13,7 +13,7 @@
 
 using boost::asio::ip::tcp;
 
-chat_client_connection::chat_client_connection(std::shared_ptr<chat_client_controller> controller, boost::asio::io_service& io_service, const std::string & name, tcp::socket socket) :
+chat_client_connection::chat_client_connection(chat_client_controller *controller, boost::asio::io_service& io_service, const std::string & name, tcp::socket socket) :
 chat_connection(controller, std::move(socket)), timer_(io_service), name_(name), connect_notice_sent_(false)
 {
 }

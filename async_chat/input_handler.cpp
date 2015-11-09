@@ -13,7 +13,7 @@
 
 #include <boost/bind.hpp>
 
-InputHandler::InputHandler( boost::asio::io_service& io_service) : _input(io_service)
+InputHandler::InputHandler( boost::asio::io_service& io_service, chat_client_controller &controller) : _input(io_service), controller_(controller)
 {
     _input.assign( STDIN_FILENO );
     read();

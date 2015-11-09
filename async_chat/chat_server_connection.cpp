@@ -11,7 +11,7 @@
 #include "chat_message_client_notice.h"
 #include "chat_message_text.h"
 
-chat_server_connection::chat_server_connection(std::shared_ptr<chat_client_controller> controller, boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket) :
+chat_server_connection::chat_server_connection(chat_client_controller *controller, boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket) :
 chat_connection(controller, std::move(socket)), timer_(io_service), client_notice_received_(false)
 {
 }

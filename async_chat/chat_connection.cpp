@@ -31,7 +31,7 @@ void chat_connection::disconnect()
     socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
 }
 
-chat_connection::chat_connection(std::shared_ptr<chat_client_controller> controller, tcp::socket socket) :
+chat_connection::chat_connection(chat_client_controller *controller, tcp::socket socket) :
 controller_(controller),
 socket_ (std::move(socket)),
 read_state_(ReadState::Header)

@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "93898AE71BEE40260049D1DC"
-               BuildableName = "async_chat"
-               BlueprintName = "async_chat"
+               BlueprintIdentifier = "93FA07501BF1036C00DF5111"
+               BuildableName = "client"
+               BlueprintName = "client"
                ReferencedContainer = "container:async_chat.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "93898AE71BEE40260049D1DC"
-            BuildableName = "async_chat"
-            BlueprintName = "async_chat"
+            BlueprintIdentifier = "93FA07501BF1036C00DF5111"
+            BuildableName = "client"
+            BlueprintName = "client"
             ReferencedContainer = "container:async_chat.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -55,18 +55,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "93898AE71BEE40260049D1DC"
-            BuildableName = "async_chat"
-            BlueprintName = "async_chat"
+            BlueprintIdentifier = "93FA07501BF1036C00DF5111"
+            BuildableName = "client"
+            BlueprintName = "client"
             ReferencedContainer = "container:async_chat.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "-p 12345"
-            isEnabled = "YES">
-         </CommandLineArgument>
-      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -80,9 +74,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "93898AE71BEE40260049D1DC"
-            BuildableName = "async_chat"
-            BlueprintName = "async_chat"
+            BlueprintIdentifier = "93FA07501BF1036C00DF5111"
+            BuildableName = "client"
+            BlueprintName = "client"
             ReferencedContainer = "container:async_chat.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -95,7 +95,7 @@ void chat_server::accept_handler(const boost::system::error_code& error)
 {
     if (!error)
     {
-        auto client = std::make_shared<chat_server_connection>(std::shared_ptr<chat_client_controller>(this), io_service_, std::move(socket_));
+        auto client = std::make_shared<chat_server_connection>(this, io_service_, std::move(socket_));
         clients_.insert(client);
         client->start();
     }
