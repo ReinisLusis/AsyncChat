@@ -19,6 +19,17 @@ chat_message_text2::~chat_message_text2() {}
 
 chat_message_text2::chat_message_text2() {}
 
+bool chat_message_text2::Serialize(std::ostream & stream) const
+{
+    try {
+        boost::archive::text_oarchive a(stream);
+        a << this;
+        return true;
+    } catch (...) {
+        return false;
+    }
+};
+
 template<class Archive>
 void chat_message_text2::serialize(Archive & ar, const unsigned int version)
 {

@@ -55,18 +55,14 @@ int ClientOptions::CreateOptions(int argc, char ** argv)
         return 1;
     }
     
+    std::string address;
     if (vm.count("a")) {
-        tcp::resolver::query query(vm["a"].as<std::string>());
-        tcp::resolver::iterator endpoint_iterator = resolver_.resolve(query);
-        tcp::resolver::iterator end;
-        
-        if (endpoint_iterator == end)
+        address = vm["a"].as<std::string>();
+        if (address.empty())
         {
-            std::cout << "Unable to resolve server" << std::endl;
+            std::cout << "Empty address provided." << std::endl;
             return 1;
         }
-        
-        endpoint_ = *endpoint_iterator;
     } else {
         std::cout << "Server address was not provided." << std::endl;
         return 1;
@@ -84,6 +80,17 @@ int ClientOptions::CreateOptions(int argc, char ** argv)
         std::cout << "Nick name was not specified." << std::endl;
         return 1;
     }
+    
+    tcp::resolver::query query(address, boost::lexical_cast<std::string>(port_));
+    tcp::resolver::iterator endpoint_iterator = resolver_.resolve(query);
+    tcp::resolver::iterator end;
+    if (endpoint_iterator == end)
+    {
+        std::cout << "Unable to resolve server" << std::endl;
+        return 1;
+    }
+    
+    endpoint_ = *endpoint_iterator;
     
     return 0;
 }

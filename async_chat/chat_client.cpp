@@ -19,14 +19,15 @@ chat_client::chat_client(boost::asio::io_service& io_service, const ClientOption
     reconnect_timer_(io_service),
     options_(options)
 {
-
 }
 
 void chat_client::connect()
 {
+    std::cerr << "chat_client::connect(), endpoint = " << options_.Endpoint() << std::endl;
+  
     auto connectTimeoutHandler = boost::bind(&chat_client::on_connect_timeout, this, boost::asio::placeholders::error);
+    connect_timer_.expires_from_now(boost::posix_time::milliseconds(options_.ConnectTimeoutMilliseconds()));
     connect_timer_.async_wait(connectTimeoutHandler);
-    connect_timer_.expires_from_now(boost::posix_time::microseconds(options_.ConnectTimeoutMilliseconds()));
     
     auto connectHandler = boost::bind(&chat_client::handle_connect, this, boost::asio::placeholders::error);
     socket_.async_connect(options_.Endpoint(), connectHandler);
@@ -36,8 +37,12 @@ void chat_client::handle_connect(const boost::system::error_code& error)
 {
     if (error) {
         std::cerr << "handle_connect error: " << boost::system::system_error(error).what() << std::endl;
+        
+        reconnect();
         return;
     }
+    
+    connect_timer_.cancel();
     
     client_connection_ = std::make_shared<chat_client_connection>(this, io_service_, options_.Name(), std::move(socket_));
     client_connection_->start();
@@ -50,9 +55,8 @@ void chat_client::on_connect_timeout(const boost::system::error_code& error)
         return;
     }
     
+    std::cerr << "closing connection due to timeout" << std::endl;
     socket_.close();
-    
-    reconnect();
 }
 
 void chat_client::on_reconnect_timer(const boost::system::error_code& error)
@@ -67,9 +71,11 @@ void chat_client::on_reconnect_timer(const boost::system::error_code& error)
 
 void chat_client::reconnect()
 {
-    auto reconnectHandler = boost::bind(&chat_client::on_connect_timeout, this, boost::asio::placeholders::error);
+    std::cerr << "chat_client::reconnect()" << std::endl;
+    
+    auto reconnectHandler = boost::bind(&chat_client::on_reconnect_timer, this, boost::asio::placeholders::error);
+    reconnect_timer_.expires_from_now(boost::posix_time::milliseconds(options_.ReconnectWaitMilliseconds()));
     reconnect_timer_.async_wait(reconnectHandler);
-    reconnect_timer_.expires_from_now(boost::posix_time::microseconds(options_.ReconnectWaitMilliseconds()));
 }
 
 void chat_client::ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name)
@@ -103,7 +109,7 @@ void chat_client::TextReceived(std::shared_ptr<chat_connection> client, const st
         {
             // TODO: prepare and send text message
             auto msg = chat_message_text(text);
-            //client_connection_->write(<#std::shared_ptr<chat_data_packet> packet#>);
+            client_connection_->write(chat_data_packet::Create(&msg));
         }
     }
     else

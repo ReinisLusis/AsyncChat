@@ -12,6 +12,8 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 
+using boost::asio::ip::tcp;
+
 ServerOptions::ServerOptions()
 {
     
@@ -57,4 +59,9 @@ int ServerOptions::CreateOptions(int argc, char ** argv)
 int ServerOptions::Port() const
 {
     return port_;
+}
+
+tcp::endpoint ServerOptions::Endpoint() const
+{
+    return tcp::endpoint(tcp::v4(), port_);
 }

@@ -16,6 +16,8 @@ class chat_message_text2 : public chat_message_text
 public:
     chat_message_text2(const std::string & name, const std::string & text);
     
+    bool Serialize(std::ostream & stream) const override;
+    
     const std::string & Name() const;
     
     virtual ~chat_message_text2();

@@ -34,13 +34,11 @@ void InputHandler::read_handler(const boost::system::error_code& error, const si
     
     if (_command == '\n')
     {
-        std::istream is (&_input_buffer);
+        std::istream is( &_input_buffer );
+        std::string text;
+        is >> text;
         
-        std::cout << "Got " << _input_buffer.size() << " - ";
-        
-        std::copy(std::istream_iterator<char>(is), std::istream_iterator<char>(), std::ostream_iterator<char>(std::cout));
-        
-        std::cout << std::endl;
+        controller_.TextReceived(nullptr, std::string(), text);
     }
     else
     {

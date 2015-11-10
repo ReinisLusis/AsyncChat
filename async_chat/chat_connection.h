@@ -15,7 +15,7 @@
 #include <queue>
 #include <boost/asio.hpp>
 
-class chat_connection
+class chat_connection : public std::enable_shared_from_this<chat_connection>
 {
 public:
     
@@ -35,6 +35,9 @@ protected:
     void process_error(const std::string & message);
     
     chat_client_controller *Controller() const { return controller_; }
+    
+    std::shared_ptr<chat_connection> shared_chat_connection() { return shared_from_this(); }
+    
 private:
     enum class ReadState { Header, Body, Checksum };
     

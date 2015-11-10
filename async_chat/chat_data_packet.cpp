@@ -9,6 +9,7 @@
 #include "chat_data_packet.h"
 
 #include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
 #include <cryptopp/md5.h>
 
 const size_t chat_data_packet::HeaderSize = 4;
@@ -19,46 +20,100 @@ chat_data_packet::chat_data_packet()
     
 }
 
-std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message & msg)
+#include <boost/iostreams/categories.hpp> // input_filter_tag
+
+struct body_size_filter {
+    size_t body_size;
+    size_t bytes_read;
+    
+    typedef char char_type;
+    typedef boost::iostreams::multichar_input_filter_tag category;
+    
+    template<typename Source>
+    std::streamsize read(Source& src, char* s, std::streamsize n)
+    {
+        if (bytes_read >= body_size + 4)
+        {
+            return -1;
+        }
+        
+        int c;
+        
+        // read body size
+        while (bytes_read < 4 && (c = boost::iostreams::get(src)) != EOF && c != boost::iostreams::WOULD_BLOCK)
+        {
+            body_size = body_size | (static_cast<size_t>(c) << (24 - 8 * bytes_read));
+            bytes_read++;
+        }
+        
+        if (bytes_read < 4)
+        {
+            return c;
+        }
+        
+        char* first = s;
+        char* last  = s + n;
+        while (bytes_read < body_size + 4 && first != last && (c = boost::iostreams::get(src)) != EOF && c != boost::iostreams::WOULD_BLOCK )
+        {
+            *first++ = c;
+            bytes_read++;
+        }
+        
+        std::streamsize result = static_cast<std::streamsize>(first - s);
+        return result == 0 && c != boost::iostreams::WOULD_BLOCK ? -1 : result;
+    }
+    
+    body_size_filter()
+    {
+        body_size = 0;
+        bytes_read = 0;
+    }
+    
+
+};
+
+std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message * msg)
 {
     // TODO: use filtering stream to avoid copy of data
     boost::asio::streambuf stream_buf;
     std::ostream os(&stream_buf);
-    msg.Serialize(os);
+    msg->Serialize(os);
     
     auto retVal = std::shared_ptr<chat_data_packet>(new chat_data_packet());
     retVal->write_data(stream_buf);
     return retVal;
 }
 
-std::shared_ptr<chat_data_packet> chat_data_packet::Create(std::istream & stream)
+std::shared_ptr<chat_data_packet> chat_data_packet::Create(boost::asio::streambuf & buf)
 {
-    auto body_size = static_cast<size_t>(stream.get()) << 24 | static_cast<size_t>(stream.get()) << 16 | static_cast<size_t>(stream.get()) << 8 | static_cast<size_t>(stream.get()) << 0;
-    byte body_checksum [ CryptoPP::MD5::DIGESTSIZE ];
+    /*boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
+    in.push(body_size_filter());
+    in.push(buf);*/
     
-    // TODO: do not copy buffers
-    boost::asio::streambuf body_buf;
-    boost::iostreams::copy(stream, body_buf, body_size);
+    std::istream in(&buf);
     
-    boost::asio::streambuf hash_buf;
-    boost::iostreams::copy(stream, hash_buf, CryptoPP::MD5::DIGESTSIZE);
+    size_t body_size = (static_cast<size_t>(in.get()) << 24) | (static_cast<size_t>(in.get()) << 16) | (static_cast<size_t>(in.get()) << 8) | (static_cast<size_t>(in.get()) << 0);
     
+    auto data_ptr = boost::asio::buffer_cast<const byte*>(buf.data());
+   
     CryptoPP::MD5 hash;
-    hash.CalculateDigest(body_checksum, boost::asio::buffer_cast<const byte*>(body_buf.data()), body_size);
+    byte checksum [ CryptoPP::MD5::DIGESTSIZE ];
+    hash.CalculateDigest(checksum, data_ptr, body_size);
     
-    if (memcmp(body_checksum, boost::asio::buffer_cast<const byte*>(hash_buf.data()), CryptoPP::MD5::DIGESTSIZE) != 0)
+    if (memcmp(checksum, data_ptr + body_size, CryptoPP::MD5::DIGESTSIZE) != 0)
     {
         throw std::exception();
     }
-    
+   
     auto retVal = std::shared_ptr<chat_data_packet>(new chat_data_packet());
-    std::istream is(&body_buf);
-    retVal->message_ = chat_message::Deserialize(is);
+    retVal->message_ = chat_message::Deserialize(in);
     
     if (retVal->message_ == nullptr)
     {
         throw std::exception();
     }
+    
+    buf.consume(CryptoPP::MD5::DIGESTSIZE);
     
     return retVal;
 }

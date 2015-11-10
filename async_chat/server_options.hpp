@@ -11,6 +11,8 @@
 
 #include <stdio.h>
 
+#include <boost/asio.hpp>
+
 class ServerOptions
 {
 public:
@@ -19,6 +21,8 @@ public:
     int CreateOptions(int argc, char ** argv);
     
     int Port() const;
+    
+    boost::asio::ip::tcp::endpoint Endpoint() const;
     
 private:
     

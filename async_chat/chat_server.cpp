@@ -15,8 +15,9 @@
 
 #include <boost/bind.hpp>
 
-chat_server::chat_server(boost::asio::io_service& io_service, const boost::asio::ip::tcp::endpoint& endpoint) :
-    acceptor_(io_service, endpoint),
+chat_server::chat_server(boost::asio::io_service& io_service, const ServerOptions & options) :
+    options_(options),
+    acceptor_(io_service, options.Endpoint()),
     io_service_(io_service),
     socket_(io_service),
     susspend_read_(false)
@@ -33,7 +34,8 @@ void chat_server::ClientDisconnected(std::shared_ptr<chat_connection> client, co
     clients_.erase(client);
     client->disconnect();
     
-    auto packet = chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name));
+    chat_message_client_notice disconnect_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name);
+    auto packet = chat_data_packet::Create(&disconnect_notice);
     BroadcastPacket(packet, client);
 };
 
@@ -42,7 +44,8 @@ void chat_server::ClientError(std::shared_ptr<chat_connection> client, const std
     clients_.erase(client);
     client->disconnect();
     
-    auto packet = chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name));
+    chat_message_client_notice disconnect_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name);
+    auto packet = chat_data_packet::Create(&disconnect_notice);
     BroadcastPacket(packet, client);
 };
 
@@ -53,14 +56,16 @@ void chat_server::TimerExpired(std::shared_ptr<chat_connection> client, const st
     
     if (!name.empty())
     {
-        auto packet = chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name));
+        chat_message_client_notice disconnect_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name);
+        auto packet = chat_data_packet::Create(&disconnect_notice);
         BroadcastPacket(packet, client);
     }
 }
 
 void chat_server::TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text)
 {
-    auto packet = chat_data_packet::Create(chat_message_text2(name, text));
+    chat_message_text2 text_message(name, text);
+    auto packet = chat_data_packet::Create(&text_message);
     BroadcastPacket(packet, nullptr);
 };
 
@@ -87,6 +92,8 @@ void chat_server::BroadcastPacket(std::shared_ptr<chat_data_packet> packet, std:
 
 void chat_server::accept()
 {
+    std::cerr << "chat_server::accept(), endpoint = " << options_.Endpoint() << std::endl;
+
     auto acceptHandler = boost::bind(&chat_server::accept_handler, this, boost::asio::placeholders::error);
     acceptor_.async_accept(socket_, acceptHandler);
 }
@@ -98,6 +105,10 @@ void chat_server::accept_handler(const boost::system::error_code& error)
         auto client = std::make_shared<chat_server_connection>(this, io_service_, std::move(socket_));
         clients_.insert(client);
         client->start();
+    }
+    else
+    {
+        std::cerr << "chat_server::accept_handler error: " << boost::system::system_error(error).what() << std::endl;
     }
     
     accept();

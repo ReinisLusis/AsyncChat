@@ -44,7 +44,7 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
             
             client_notice_received_ = true;
             
-            Controller()->ClientConnected(std::shared_ptr<chat_connection>(this), name_);
+            Controller()->ClientConnected(shared_chat_connection(), name_);
         }
         else
         {
@@ -56,7 +56,7 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
     {
         if (auto text = std::dynamic_pointer_cast<chat_message_text>(message))
         {
-            Controller()->TextReceived(std::shared_ptr<chat_connection>(this), name_, text->Text());
+            Controller()->TextReceived(shared_chat_connection(), name_, text->Text());
         }
         else
         {
@@ -84,5 +84,5 @@ void chat_server_connection::on_timer(const boost::system::error_code& error)
         return;
     }
     
-    Controller()->TimerExpired(std::shared_ptr<chat_connection>(this), name_);
+    Controller()->TimerExpired(shared_chat_connection(), name_);
 }

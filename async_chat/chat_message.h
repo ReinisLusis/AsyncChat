@@ -18,7 +18,7 @@ class chat_message
 {
 public:
     static std::shared_ptr<chat_message> Deserialize(std::istream & stream);
-    bool Serialize(std::ostream & stream) const;
+    virtual bool Serialize(std::ostream & stream) const;
     virtual ~chat_message();
 protected:
     chat_message();
@@ -26,7 +26,7 @@ protected:
 private:
     friend class boost::serialization::access;
     template<class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+    void serialize(Archive & ar, const unsigned int version) {}
 };
 
 #endif /* chat_message_h */

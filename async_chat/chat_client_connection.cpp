@@ -20,10 +20,13 @@ chat_connection(controller, std::move(socket)), timer_(io_service), name_(name),
 
 void chat_client_connection::start()
 {
+    std::cerr << "chat_client_connection::start()" << std::endl;
+    
     if (!connect_notice_sent_)
     {
         connect_notice_sent_ = true;
-        write(chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Connected, name_)));
+        chat_message_client_notice connect_notice(chat_message_client_notice::NoticeTypeEnum::Connected, name_);
+        write(chat_data_packet::Create(&connect_notice));
     }
     
     read();
@@ -35,16 +38,16 @@ bool chat_client_connection::process_message(std::shared_ptr<chat_message> messa
     {
         if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Connected)
         {
-            Controller()->ClientConnected(std::shared_ptr<chat_connection>(this), notice->Name());
+            Controller()->ClientConnected(shared_chat_connection(), notice->Name());
         }
         else if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Disconnected)
         {
-            Controller()->ClientDisconnected(std::shared_ptr<chat_connection>(this), notice->Name());
+            Controller()->ClientDisconnected(shared_chat_connection(), notice->Name());
         }
     }
     else if (auto text = std::dynamic_pointer_cast<chat_message_text2>(message))
     {
-        Controller()->TextReceived(std::shared_ptr<chat_connection>(this), text->Name(), text->Text());
+        Controller()->TextReceived(shared_chat_connection(), text->Name(), text->Text());
     }
     else
     {

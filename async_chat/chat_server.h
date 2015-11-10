@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 
+#include "server_options.hpp"
 #include "chat_client_controller.h"
 #include "chat_data_packet.h"
 
@@ -20,7 +21,7 @@
 class chat_server : public chat_client_controller
 {
 public:
-    chat_server(boost::asio::io_service& io_service, const boost::asio::ip::tcp::endpoint& endpoint);
+    chat_server(boost::asio::io_service& io_service, const ServerOptions & options);
     
     void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
@@ -48,6 +49,7 @@ private:
     boost::asio::io_service& io_service_;
     std::set<std::shared_ptr<chat_connection>> clients_;
     std::set<std::shared_ptr<chat_connection>> susspended_clients_;
+    const ServerOptions & options_;
     bool susspend_read_;
 };
 

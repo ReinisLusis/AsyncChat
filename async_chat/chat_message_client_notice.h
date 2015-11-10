@@ -16,6 +16,8 @@ class chat_message_client_notice : public chat_message
 public:
     enum class NoticeTypeEnum { Connected, Disconnected };
     
+    bool Serialize(std::ostream & stream) const override;
+    
     chat_message_client_notice(const NoticeTypeEnum & noticeType, const std::string & name);
     
     NoticeTypeEnum NoticeType() const;

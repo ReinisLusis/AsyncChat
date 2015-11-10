@@ -87,8 +87,7 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
         case ReadState::Checksum:
         {
             try {
-                std::istream is(&read_buffer_);
-                auto packet = chat_data_packet::Create(is);
+                auto packet = chat_data_packet::Create(read_buffer_);
                 if (!process_message(packet->Message()))
                 {
                     return;
@@ -103,12 +102,12 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
         }
     }
     
-    if (!controller_->SusspendRead(std::shared_ptr<chat_connection>(this)))
+    if (!controller_->SusspendRead(shared_chat_connection()))
     {
         this->read();
     } else
     {
-        controller_->NotifySusspended(std::shared_ptr<chat_connection>(this));
+        controller_->NotifySusspended(shared_chat_connection());
     }
 }
 
