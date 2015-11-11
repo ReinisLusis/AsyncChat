@@ -16,8 +16,6 @@ class chat_message_text : public chat_message
 public:
     chat_message_text(const std::string & text);
     
-    bool Serialize(std::ostream & stream) const override;
-    
     const std::string & Text() const;
     
     virtual ~chat_message_text();
@@ -29,7 +27,11 @@ protected:
 private:
     friend class boost::serialization::access;
     template<class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(chat_message);
+        ar & BOOST_SERIALIZATION_NVP(text_);
+    }
 };
 
 #endif /* chat_message_text_h */

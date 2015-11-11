@@ -22,6 +22,7 @@ public:
     
 protected:
     bool process_message(std::shared_ptr<chat_message> message) override;
+    void connection_closed() override;
     
 private:
     void setTimer();    

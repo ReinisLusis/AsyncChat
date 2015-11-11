@@ -8,88 +8,64 @@
 
 #include "chat_data_packet.h"
 
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filtering_streambuf.hpp>
+#include "chat_message_client_notice.h"
+#include "chat_message_text.h"
+#include "chat_message_text2.h"
+
+#include <boost/serialization/shared_ptr.hpp>
+
+BOOST_SERIALIZATION_SHARED_PTR(chat_message)
+BOOST_CLASS_EXPORT_GUID(chat_message, "chat_message")
+BOOST_CLASS_EXPORT_GUID(chat_message_text, "chat_message_text")
+BOOST_CLASS_EXPORT_GUID(chat_message_text2, "chat_message_text2")
+BOOST_CLASS_EXPORT_GUID(chat_message_client_notice, "chat_message_client_notice")
+
 #include <cryptopp/md5.h>
+#include <boost/iostreams/copy.hpp>
 
 const size_t chat_data_packet::HeaderSize = 4;
 const size_t chat_data_packet::ChecksumSize = CryptoPP::MD5::DIGESTSIZE;
 
-chat_data_packet::chat_data_packet()
+chat_data_packet::chat_data_packet(std::shared_ptr<chat_message> message) : message_(message)
 {
-    
 }
 
-#include <boost/iostreams/categories.hpp> // input_filter_tag
-
-struct body_size_filter {
-    size_t body_size;
-    size_t bytes_read;
-    
-    typedef char char_type;
-    typedef boost::iostreams::multichar_input_filter_tag category;
-    
-    template<typename Source>
-    std::streamsize read(Source& src, char* s, std::streamsize n)
-    {
-        if (bytes_read >= body_size + 4)
-        {
-            return -1;
-        }
-        
-        int c;
-        
-        // read body size
-        while (bytes_read < 4 && (c = boost::iostreams::get(src)) != EOF && c != boost::iostreams::WOULD_BLOCK)
-        {
-            body_size = body_size | (static_cast<size_t>(c) << (24 - 8 * bytes_read));
-            bytes_read++;
-        }
-        
-        if (bytes_read < 4)
-        {
-            return c;
-        }
-        
-        char* first = s;
-        char* last  = s + n;
-        while (bytes_read < body_size + 4 && first != last && (c = boost::iostreams::get(src)) != EOF && c != boost::iostreams::WOULD_BLOCK )
-        {
-            *first++ = c;
-            bytes_read++;
-        }
-        
-        std::streamsize result = static_cast<std::streamsize>(first - s);
-        return result == 0 && c != boost::iostreams::WOULD_BLOCK ? -1 : result;
-    }
-    
-    body_size_filter()
-    {
-        body_size = 0;
-        bytes_read = 0;
-    }
-    
-
-};
+chat_data_packet::chat_data_packet()
+{
+}
 
 std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message * msg)
 {
-    // TODO: use filtering stream to avoid copy of data
-    boost::asio::streambuf stream_buf;
-    std::ostream os(&stream_buf);
-    msg->Serialize(os);
+    boost::asio::streambuf msg_buf;
+    std::ostream msg_stream(&msg_buf);
+    boost::archive::xml_oarchive msg_archive(msg_stream);
+    msg_archive.template register_type<chat_message>();
+    msg_archive.template register_type<chat_message_client_notice>();
+    msg_archive.template register_type<chat_message_text>();
+    msg_archive.template register_type<chat_message_text2>();
+    msg_archive << boost::serialization::make_nvp("item", msg);
+    
+    CryptoPP::MD5 hash;
+    byte checksum [ CryptoPP::MD5::DIGESTSIZE ];
+    hash.CalculateDigest(checksum, boost::asio::buffer_cast<const byte*>(msg_buf.data()), msg_buf.size());
     
     auto retVal = std::shared_ptr<chat_data_packet>(new chat_data_packet());
-    retVal->write_data(stream_buf);
+    std::ostream os(&retVal->buf_);
+    
+    os << static_cast<unsigned char>((msg_buf.size() >> 24) & 0xFF);
+    os << static_cast<unsigned char>((msg_buf.size() >> 16) & 0xFF);
+    os << static_cast<unsigned char>((msg_buf.size() >> 8) & 0xFF);
+    os << static_cast<unsigned char>((msg_buf.size() >> 0) & 0xFF);
+
+    boost::iostreams::copy(msg_buf, retVal->buf_);
+    
+    os.write(reinterpret_cast<char*>(checksum), CryptoPP::MD5::DIGESTSIZE);
+    
     return retVal;
 }
 
 std::shared_ptr<chat_data_packet> chat_data_packet::Create(boost::asio::streambuf & buf)
 {
-    /*boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
-    in.push(body_size_filter());
-    in.push(buf);*/
-    
     std::istream in(&buf);
     
     size_t body_size = (static_cast<size_t>(in.get()) << 24) | (static_cast<size_t>(in.get()) << 16) | (static_cast<size_t>(in.get()) << 8) | (static_cast<size_t>(in.get()) << 0);
@@ -104,36 +80,20 @@ std::shared_ptr<chat_data_packet> chat_data_packet::Create(boost::asio::streambu
     {
         throw std::exception();
     }
-   
-    auto retVal = std::shared_ptr<chat_data_packet>(new chat_data_packet());
-    retVal->message_ = chat_message::Deserialize(in);
+
+    chat_message *message;
+    boost::archive::xml_iarchive i(in);
+    i.template register_type<chat_message>();
+    i.template register_type<chat_message_client_notice>();
+    i.template register_type<chat_message_text>();
+    i.template register_type<chat_message_text2>();
+    i >> boost::serialization::make_nvp("item", message);
     
-    if (retVal->message_ == nullptr)
-    {
+    if (message == nullptr) {
         throw std::exception();
     }
     
     buf.consume(CryptoPP::MD5::DIGESTSIZE);
     
-    return retVal;
-}
-
-void chat_data_packet::write_data(boost::asio::streambuf & buf)
-{
-    std::ostream os(&buf_);
-    
-    os << static_cast<unsigned char>((buf.size() >> 24) & 0xFF);
-    os << static_cast<unsigned char>((buf.size() >> 16) & 0xFF);
-    os << static_cast<unsigned char>((buf.size() >> 8) & 0xFF);
-    os << static_cast<unsigned char>((buf.size() >> 0) & 0xFF);
-    
-    CryptoPP::MD5 hash;
-    byte checksum [ CryptoPP::MD5::DIGESTSIZE ];
-    
-    hash.CalculateDigest(checksum, boost::asio::buffer_cast<const byte*>(buf.data()), buf.size());
-    
-    std::istream is(&buf);
-    boost::iostreams::copy(is, os);
-    
-    os.write(reinterpret_cast<char*>(checksum), CryptoPP::MD5::DIGESTSIZE);
+    return std::make_shared<chat_data_packet>(std::shared_ptr<chat_message>(message));
 }

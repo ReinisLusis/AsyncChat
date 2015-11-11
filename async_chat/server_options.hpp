@@ -22,6 +22,10 @@ public:
     
     int Port() const;
     
+    int ClientInactivityTimeoutSeconds() const;
+    
+    int ClientMaxMessageCount() const;
+    
     boost::asio::ip::tcp::endpoint Endpoint() const;
     
 private:

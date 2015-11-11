@@ -60,6 +60,12 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
 {
     if (error) {
         std::cerr << "read error: " << boost::system::system_error(error).what() << std::endl;
+        
+        if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
+        {
+            connection_closed();
+        }
+        
         return;
     }
     
@@ -115,6 +121,11 @@ void chat_connection::write_handler(const boost::system::error_code& error, cons
 {
     if (error) {
         std::cerr << "write error: " << boost::system::system_error(error).what() << std::endl;
+        
+        if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
+        {
+            connection_closed();
+        }
         return;
     }
     
@@ -130,6 +141,12 @@ std::size_t chat_connection::completion_handler(const boost::system::error_code&
 {
     if (error) {
         std::cerr << "completion_handler error: " << boost::system::system_error(error).what() << std::endl;
+        
+        if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
+        {
+            connection_closed();
+        }
+        
         return 0;
     }
     

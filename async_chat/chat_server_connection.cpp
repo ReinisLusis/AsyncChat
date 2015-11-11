@@ -8,6 +8,7 @@
 
 #include "chat_server_connection.h"
 
+#include "chat_server.h"
 #include "chat_message_client_notice.h"
 #include "chat_message_text.h"
 
@@ -70,10 +71,15 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
     return true;
 }
 
+void chat_server_connection::connection_closed()
+{
+    Controller()->ClientDisconnected(this->shared_chat_connection(), this->name_, false);
+}
+
 void chat_server_connection::setTimer()
 {
     auto timerHandler = boost::bind(&chat_server_connection::on_timer, this, boost::asio::placeholders::error);
-    timer_.expires_from_now(boost::posix_time::milliseconds(10000));
+    timer_.expires_from_now(boost::posix_time::seconds(dynamic_cast<chat_server*>(Controller())->Options().ClientInactivityTimeoutSeconds()));
     timer_.async_wait(timerHandler);
 }
 

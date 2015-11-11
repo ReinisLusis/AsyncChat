@@ -11,15 +11,14 @@
 
 #include <boost/serialization/export.hpp>
 
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+#include <boost/archive/xml_iarchive.hpp>
 
 class chat_message
 {
 public:
-    static std::shared_ptr<chat_message> Deserialize(std::istream & stream);
-    virtual bool Serialize(std::ostream & stream) const;
     virtual ~chat_message();
+
 protected:
     chat_message();
     

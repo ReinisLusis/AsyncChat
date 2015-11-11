@@ -25,12 +25,16 @@ public:
     
     void disconnect();
 
+    size_t queued_message_count() const { return write_queue_.size(); }
+    
 protected:
     chat_connection(chat_client_controller *controller, boost::asio::ip::tcp::socket socket);
     
     void read();
     
     virtual bool process_message(std::shared_ptr<chat_message> message) = 0;
+    
+    virtual void connection_closed() = 0;
     
     void process_error(const std::string & message);
     

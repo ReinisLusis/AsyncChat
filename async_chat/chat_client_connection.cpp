@@ -40,9 +40,9 @@ bool chat_client_connection::process_message(std::shared_ptr<chat_message> messa
         {
             Controller()->ClientConnected(shared_chat_connection(), notice->Name());
         }
-        else if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Disconnected)
+        else if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Disconnected || notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity)
         {
-            Controller()->ClientDisconnected(shared_chat_connection(), notice->Name());
+            Controller()->ClientDisconnected(shared_chat_connection(), notice->Name(), notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity);
         }
     }
     else if (auto text = std::dynamic_pointer_cast<chat_message_text2>(message))
@@ -56,4 +56,9 @@ bool chat_client_connection::process_message(std::shared_ptr<chat_message> messa
     }
     
     return true;
+}
+
+void chat_client_connection::connection_closed()
+{
+    Controller()->ClientDisconnected(this->shared_chat_connection(), std::string(), false);
 }

@@ -14,12 +14,26 @@
 
 chat_client::chat_client(boost::asio::io_service& io_service, const ClientOptions & options) :
     socket_(io_service),
+    signal_set_(io_service, SIGINT, SIGTERM),
     io_service_(io_service),
     connect_timer_(io_service),
     reconnect_timer_(io_service),
     options_(options)
 {
+    auto signalHandler = boost::bind(&chat_client::on_signal, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number);
+    signal_set_.async_wait(signalHandler);
 }
+
+void chat_client::on_signal(const boost::system::error_code& error, int signal_number)
+{
+    if (error) {
+        std::cerr << "chat_client::on_signal error: " << boost::system::system_error(error).what() << std::endl;
+        return;
+    }
+    
+    io_service_.stop();
+}
+
 
 void chat_client::connect()
 {
@@ -83,11 +97,22 @@ void chat_client::ClientConnected(std::shared_ptr<chat_connection> client, const
     std::cout << name << " joined chat" << std::endl;
 }
 
-void chat_client::ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name)
+void chat_client::ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity)
 {
-    if (client != client_connection_)
+    if (!name.empty())
     {
-        std::cout << name << " left chat" << std::endl;
+        if (!inactivity)
+        {
+            std::cout << name << " left the chat, connection lost" << std::endl;
+        }
+        else
+        {
+            std::cout << name << " left the chat due inactivity" << std::endl;
+        }
+    }
+    else
+    {
+        io_service_.stop();
     }
 }
 
@@ -102,12 +127,10 @@ void chat_client::TimerExpired(std::shared_ptr<chat_connection> client, const st
 
 void chat_client::TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text)
 {
-    // InputHandler calls this function passing client nullptr
     if (client == nullptr)
     {
         if (client_connection_ != nullptr)
         {
-            // TODO: prepare and send text message
             auto msg = chat_message_text(text);
             client_connection_->write(chat_data_packet::Create(&msg));
         }

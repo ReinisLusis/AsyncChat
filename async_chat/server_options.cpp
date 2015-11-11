@@ -65,3 +65,14 @@ tcp::endpoint ServerOptions::Endpoint() const
 {
     return tcp::endpoint(tcp::v4(), port_);
 }
+
+int ServerOptions::ClientInactivityTimeoutSeconds() const
+{
+    return 20;
+}
+
+int ServerOptions::ClientMaxMessageCount() const
+{
+    return 5;
+}
+

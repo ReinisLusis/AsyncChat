@@ -16,6 +16,8 @@
 class chat_data_packet
 {
 public:
+    chat_data_packet(std::shared_ptr<chat_message> message);
+    
     static std::shared_ptr<chat_data_packet> Create(const chat_message * msg);
     
     static std::shared_ptr<chat_data_packet> Create(boost::asio::streambuf & buf);
@@ -26,6 +28,7 @@ public:
     
     static const size_t HeaderSize;
     static const size_t ChecksumSize;
+
 private:
     chat_data_packet();
     

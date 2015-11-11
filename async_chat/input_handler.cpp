@@ -34,11 +34,11 @@ void InputHandler::read_handler(const boost::system::error_code& error, const si
     
     if (_command == '\n')
     {
-        std::istream is( &_input_buffer );
-        std::string text;
-        is >> text;
+        boost::asio::streambuf::const_buffers_type buf = _input_buffer.data();
+        std::string str(boost::asio::buffers_begin(buf), boost::asio::buffers_end(buf));
+        _input_buffer.consume(_input_buffer.size());
         
-        controller_.TextReceived(nullptr, std::string(), text);
+        controller_.TextReceived(nullptr, std::string(), str);
     }
     else
     {

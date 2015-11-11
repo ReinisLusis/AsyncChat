@@ -6,9 +6,6 @@
 
 #include "server_options.hpp"
 
-#include "chat_message_text.h"
-#include "chat_data_packet.h"
-
 using boost::asio::ip::tcp;
 
 int main(int argc, char ** argv)

@@ -25,7 +25,7 @@ public:
     
     void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
-    void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
+    void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity) override;
     
     void ClientError(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
@@ -37,6 +37,8 @@ public:
     
     void NotifySusspended(std::shared_ptr<chat_connection> client) override;
 
+    inline const ServerOptions& Options() const { return options_; }
+    
 private:
     void BroadcastPacket(std::shared_ptr<chat_data_packet> packet, std::shared_ptr<chat_connection> excludeClient);
     
@@ -44,8 +46,11 @@ private:
     
     void accept_handler(const boost::system::error_code& error);
     
+    void on_signal(const boost::system::error_code& error, int signal_number);
+    
     boost::asio::ip::tcp::acceptor acceptor_;
     boost::asio::ip::tcp::socket socket_;
+    boost::asio::signal_set signal_set_;
     boost::asio::io_service& io_service_;
     std::set<std::shared_ptr<chat_connection>> clients_;
     std::set<std::shared_ptr<chat_connection>> susspended_clients_;

@@ -14,9 +14,7 @@
 class chat_message_client_notice : public chat_message
 {
 public:
-    enum class NoticeTypeEnum { Connected, Disconnected };
-    
-    bool Serialize(std::ostream & stream) const override;
+    enum class NoticeTypeEnum { Connected, Disconnected, DisconnectedDueInactivity };
     
     chat_message_client_notice(const NoticeTypeEnum & noticeType, const std::string & name);
     
@@ -34,7 +32,12 @@ protected:
 private:
     friend class boost::serialization::access;
     template<class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(chat_message);
+        ar & BOOST_SERIALIZATION_NVP(notice_type_);
+        ar & BOOST_SERIALIZATION_NVP(name_);
+    }
 };
 
 #endif /* chat_message_client_notice_h */

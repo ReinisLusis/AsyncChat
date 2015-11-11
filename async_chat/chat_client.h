@@ -28,7 +28,7 @@ public:
     
     void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
-    void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
+    void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity) override;
     
     void ClientError(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
@@ -51,8 +51,11 @@ private:
     
     void reconnect();
     
+    void on_signal(const boost::system::error_code& error, int signal_number);
+    
     boost::asio::ip::tcp::socket socket_;
     boost::asio::io_service& io_service_;
+    boost::asio::signal_set signal_set_;
     boost::asio::deadline_timer connect_timer_;
     boost::asio::deadline_timer reconnect_timer_;
     const ClientOptions & options_;
