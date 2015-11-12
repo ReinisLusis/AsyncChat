@@ -21,18 +21,14 @@
 		93FA07461BF0FD2000DF5111 /* chat_message_text2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07451BF0FD2000DF5111 /* chat_message_text2.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA07481BF0FD8700DF5111 /* chat_message_client_notice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07471BF0FD8700DF5111 /* chat_message_client_notice.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA074A1BF0FE1200DF5111 /* chat_server_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07491BF0FE1200DF5111 /* chat_server_connection.cpp */; settings = {ASSET_TAGS = (); }; };
-		93FA074C1BF0FE9300DF5111 /* chat_client_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA074B1BF0FE9300DF5111 /* chat_client_connection.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA074F1BF1019B00DF5111 /* server_options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA074D1BF1019B00DF5111 /* server_options.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA07521BF1036C00DF5111 /* chat_message_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07431BF0FBAB00DF5111 /* chat_message_text.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA07531BF1036C00DF5111 /* chat_message_text2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07451BF0FD2000DF5111 /* chat_message_text2.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA07551BF1036C00DF5111 /* input_handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F0A1BEFD78000B3A2C2 /* input_handler.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA07561BF1036C00DF5111 /* chat_data_packet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F031BEFD0AC00B3A2C2 /* chat_data_packet.cpp */; settings = {ASSET_TAGS = (); }; };
-		93FA07571BF1036C00DF5111 /* server_options.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA074D1BF1019B00DF5111 /* server_options.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA07581BF1036C00DF5111 /* chat_message_client_notice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07471BF0FD8700DF5111 /* chat_message_client_notice.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA07591BF1036C00DF5111 /* chat_client_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA074B1BF0FE9300DF5111 /* chat_client_connection.cpp */; settings = {ASSET_TAGS = (); }; };
-		93FA075A1BF1036C00DF5111 /* chat_server_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93FA07491BF0FE1200DF5111 /* chat_server_connection.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA075B1BF1036C00DF5111 /* chat_message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F0F1BEFD90E00B3A2C2 /* chat_message.cpp */; settings = {ASSET_TAGS = (); }; };
-		93FA075C1BF1036C00DF5111 /* chat_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F061BEFD29700B3A2C2 /* chat_server.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA075D1BF1036C00DF5111 /* chat_connection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EB5F081BEFD46400B3A2C2 /* chat_connection.cpp */; settings = {ASSET_TAGS = (); }; };
 		93FA075F1BF1036C00DF5111 /* libcryptopp.so in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EB5F0C1BEFD86100B3A2C2 /* libcryptopp.so */; };
 		93FA07601BF1036C00DF5111 /* libboost_serialization.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EB5EF51BEF84F300B3A2C2 /* libboost_serialization.dylib */; };
@@ -65,6 +61,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		935499361BF5241A003D11E7 /* libboost_thread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_thread.dylib; path = ../../../../../usr/local/lib/libboost_thread.dylib; sourceTree = "<group>"; };
 		93898AE81BEE40260049D1DC /* server */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = server; sourceTree = BUILT_PRODUCTS_DIR; };
 		93898AEB1BEE40260049D1DC /* server.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = server.cpp; sourceTree = "<group>"; };
 		93EB5EF11BEE4CC800B3A2C2 /* libboost_system.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libboost_system.dylib; path = ../../../../../usr/local/lib/libboost_system.dylib; sourceTree = "<group>"; };
@@ -131,6 +128,7 @@
 		93898ADF1BEE40260049D1DC = {
 			isa = PBXGroup;
 			children = (
+				935499361BF5241A003D11E7 /* libboost_thread.dylib */,
 				93EB5F0C1BEFD86100B3A2C2 /* libcryptopp.so */,
 				93EB5EF51BEF84F300B3A2C2 /* libboost_serialization.dylib */,
 				93EB5EF31BEE577F00B3A2C2 /* libboost_program_options.dylib */,
@@ -266,7 +264,6 @@
 				93EB5F051BEFD0AC00B3A2C2 /* chat_data_packet.cpp in Sources */,
 				93FA074F1BF1019B00DF5111 /* server_options.cpp in Sources */,
 				93FA07481BF0FD8700DF5111 /* chat_message_client_notice.cpp in Sources */,
-				93FA074C1BF0FE9300DF5111 /* chat_client_connection.cpp in Sources */,
 				93FA074A1BF0FE1200DF5111 /* chat_server_connection.cpp in Sources */,
 				93EB5F101BEFD90E00B3A2C2 /* chat_message.cpp in Sources */,
 				93EB5F071BEFD29700B3A2C2 /* chat_server.cpp in Sources */,
@@ -283,13 +280,10 @@
 				93FA07691BF1055F00DF5111 /* client.cpp in Sources */,
 				93FA07551BF1036C00DF5111 /* input_handler.cpp in Sources */,
 				93FA07561BF1036C00DF5111 /* chat_data_packet.cpp in Sources */,
-				93FA07571BF1036C00DF5111 /* server_options.cpp in Sources */,
 				93FA07581BF1036C00DF5111 /* chat_message_client_notice.cpp in Sources */,
 				93FA07591BF1036C00DF5111 /* chat_client_connection.cpp in Sources */,
-				93FA075A1BF1036C00DF5111 /* chat_server_connection.cpp in Sources */,
 				93FA075B1BF1036C00DF5111 /* chat_message.cpp in Sources */,
 				93FA076C1BF1060000DF5111 /* client_options.cpp in Sources */,
-				93FA075C1BF1036C00DF5111 /* chat_server.cpp in Sources */,
 				93FA076F1BF108D200DF5111 /* chat_client.cpp in Sources */,
 				93FA075D1BF1036C00DF5111 /* chat_connection.cpp in Sources */,
 			);

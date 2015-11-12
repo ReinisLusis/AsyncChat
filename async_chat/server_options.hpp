@@ -26,6 +26,10 @@ public:
     
     int ClientMaxMessageCount() const;
     
+    int AverageWriteQueueLengthPerClientBeforeSusspend() const;
+    
+    int ResumeReadTimerTimeoutSeconds() const;
+    
     boost::asio::ip::tcp::endpoint Endpoint() const;
     
 private:

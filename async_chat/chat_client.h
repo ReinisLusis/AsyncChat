@@ -18,6 +18,8 @@
 
 #include "chat_client_connection.h"
 
+#include "input_handler.h"
+
 #include <set>
 #include <boost/asio.hpp>
 
@@ -26,20 +28,24 @@ class chat_client : public chat_client_controller
 public:
     chat_client(boost::asio::io_service& io_service, const ClientOptions & options);
     
-    void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
+    virtual void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
-    void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity) override;
+    virtual void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity) override;
     
-    void ClientError(std::shared_ptr<chat_connection> client, const std::string & name) override;
+    virtual void ClientError(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
-    void TimerExpired(std::shared_ptr<chat_connection> client, const std::string & name) override;
+    virtual void WriteCompleted(std::shared_ptr<chat_connection> client) override;
     
-    void TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text) override;
+    virtual void TimerExpired(std::shared_ptr<chat_connection> client, const std::string & name) override;
     
-    bool SusspendRead(std::shared_ptr<chat_connection> client) override;
+    virtual void TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text) override;
     
-    void NotifySusspended(std::shared_ptr<chat_connection> client) override;
+    virtual bool SusspendRead(std::shared_ptr<chat_connection> client) override;
+    
+    virtual void NotifySusspended(std::shared_ptr<chat_connection> client) override;
 
+    void NameAlreadyInUse();
+    
     void connect();
     
 private:
@@ -48,6 +54,8 @@ private:
     void on_connect_timeout(const boost::system::error_code& error);
     
     void on_reconnect_timer(const boost::system::error_code& error);
+    
+
     
     void reconnect();
     
@@ -60,6 +68,7 @@ private:
     boost::asio::deadline_timer reconnect_timer_;
     const ClientOptions & options_;
     std::shared_ptr<chat_client_connection> client_connection_;
+    std::shared_ptr<InputHandler> input_handler_;
 };
 
 #endif /* chat_client_hpp */

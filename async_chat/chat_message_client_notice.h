@@ -14,7 +14,7 @@
 class chat_message_client_notice : public chat_message
 {
 public:
-    enum class NoticeTypeEnum { Connected, Disconnected, DisconnectedDueInactivity };
+    enum class NoticeTypeEnum { Connected, Disconnected, DisconnectedDueInactivity, NameAlreadyInUse };
     
     chat_message_client_notice(const NoticeTypeEnum & noticeType, const std::string & name);
     

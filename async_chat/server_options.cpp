@@ -76,3 +76,13 @@ int ServerOptions::ClientMaxMessageCount() const
     return 5;
 }
 
+int ServerOptions::AverageWriteQueueLengthPerClientBeforeSusspend() const
+{
+    return 3;
+}
+
+int ServerOptions::ResumeReadTimerTimeoutSeconds() const
+{
+    return 2;
+}
+

@@ -18,11 +18,17 @@ class chat_server_connection : public chat_connection
 public:
     chat_server_connection(chat_client_controller *controller, boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket);
     
-    void start() override;
+    virtual void start() override;
+
+    void resumeRead();
+    
+    const std::string & Name() const { return name_; }
+    
+    virtual void disconnect() override;
     
 protected:
-    bool process_message(std::shared_ptr<chat_message> message) override;
-    void connection_closed() override;
+    virtual bool process_message(std::shared_ptr<chat_message> message) override;
+    virtual void connection_closed() override;
     
 private:
     void setTimer();    

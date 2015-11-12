@@ -94,7 +94,15 @@ void chat_client::reconnect()
 
 void chat_client::ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name)
 {
-    std::cout << name << " joined chat" << std::endl;
+    if (!name.empty())
+    {
+        std::cout << name << " joined chat" << std::endl;
+
+    }
+    else
+    {
+        input_handler_ = std::make_shared<InputHandler>(io_service_, *this);
+    }
 }
 
 void chat_client::ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity)
@@ -131,14 +139,18 @@ void chat_client::TextReceived(std::shared_ptr<chat_connection> client, const st
     {
         if (client_connection_ != nullptr)
         {
-            auto msg = chat_message_text(text);
-            client_connection_->write(chat_data_packet::Create(&msg));
+            client_connection_->write(chat_data_packet::Create(chat_message_text(text)));
         }
     }
     else
     {
         std::cout << name << " : " << text << std::endl;
     }
+}
+
+void chat_client::NameAlreadyInUse()
+{
+    std::cout << "Nickname " << options_.Name() << " is already taken" << std::endl;
 }
 
 bool chat_client::SusspendRead(std::shared_ptr<chat_connection> client)
@@ -149,4 +161,9 @@ bool chat_client::SusspendRead(std::shared_ptr<chat_connection> client)
 void chat_client::NotifySusspended(std::shared_ptr<chat_connection> client)
 {
     
+}
+
+void chat_client::WriteCompleted(std::shared_ptr<chat_connection> client)
+{
+
 }

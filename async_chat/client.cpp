@@ -2,8 +2,6 @@
 #include <iostream>
 #include <queue>
 
-#include "input_handler.h"
-
 #include "chat_client.h"
 
 #include "client_options.hpp"
@@ -23,8 +21,6 @@ int main(int argc, char ** argv)
         
         chat_client client(io_service, options);
         client.connect();
-
-        InputHandler inputHandler(io_service, client);
         
         io_service.run();
     } catch( std::exception & e)

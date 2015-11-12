@@ -45,7 +45,7 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
             
             client_notice_received_ = true;
             
-            Controller()->ClientConnected(shared_chat_connection(), name_);
+            Controller()->ClientConnected(shared_from_this(), name_);
         }
         else
         {
@@ -57,7 +57,7 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
     {
         if (auto text = std::dynamic_pointer_cast<chat_message_text>(message))
         {
-            Controller()->TextReceived(shared_chat_connection(), name_, text->Text());
+            Controller()->TextReceived(shared_from_this(), name_, text->Text());
         }
         else
         {
@@ -73,12 +73,12 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
 
 void chat_server_connection::connection_closed()
 {
-    Controller()->ClientDisconnected(this->shared_chat_connection(), this->name_, false);
+    Controller()->ClientDisconnected(shared_from_this(), name_, false);
 }
 
 void chat_server_connection::setTimer()
 {
-    auto timerHandler = boost::bind(&chat_server_connection::on_timer, this, boost::asio::placeholders::error);
+    auto timerHandler = boost::bind(&chat_server_connection::on_timer, std::dynamic_pointer_cast<chat_server_connection>(shared_from_this()), boost::asio::placeholders::error);
     timer_.expires_from_now(boost::posix_time::seconds(dynamic_cast<chat_server*>(Controller())->Options().ClientInactivityTimeoutSeconds()));
     timer_.async_wait(timerHandler);
 }
@@ -90,5 +90,17 @@ void chat_server_connection::on_timer(const boost::system::error_code& error)
         return;
     }
     
-    Controller()->TimerExpired(shared_chat_connection(), name_);
+    Controller()->TimerExpired(shared_from_this(), name_);
 }
+
+void chat_server_connection::disconnect()
+{
+    timer_.cancel();
+    chat_connection::disconnect();
+}
+
+void chat_server_connection::resumeRead()
+{
+    read();
+}
+

@@ -20,13 +20,12 @@ int main(int argc, char ** argv)
         boost::asio::io_service io_service;
         
         chat_server server(io_service, options);
+        server.accept();
         
         io_service.run();
     } catch( std::exception & e)
     {
         std::cout << e.what() << std::endl;
     }
-    std::cout << "Program has ended" << std::endl;
-    getchar();
     return 0;
 }

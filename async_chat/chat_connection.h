@@ -23,10 +23,12 @@ public:
     
     void write(std::shared_ptr<chat_data_packet> packet);
     
-    void disconnect();
+    virtual void disconnect();
 
     size_t queued_message_count() const { return write_queue_.size(); }
     
+    virtual ~chat_connection();
+
 protected:
     chat_connection(chat_client_controller *controller, boost::asio::ip::tcp::socket socket);
     
@@ -39,8 +41,6 @@ protected:
     void process_error(const std::string & message);
     
     chat_client_controller *Controller() const { return controller_; }
-    
-    std::shared_ptr<chat_connection> shared_chat_connection() { return shared_from_this(); }
     
 private:
     enum class ReadState { Header, Body, Checksum };

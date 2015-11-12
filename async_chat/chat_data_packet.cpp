@@ -34,7 +34,7 @@ chat_data_packet::chat_data_packet()
 {
 }
 
-std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message * msg)
+std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message & msg)
 {
     boost::asio::streambuf msg_buf;
     std::ostream msg_stream(&msg_buf);
@@ -43,7 +43,8 @@ std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message * 
     msg_archive.template register_type<chat_message_client_notice>();
     msg_archive.template register_type<chat_message_text>();
     msg_archive.template register_type<chat_message_text2>();
-    msg_archive << boost::serialization::make_nvp("item", msg);
+    const chat_message * msg_p = &msg;
+    msg_archive << boost::serialization::make_nvp("item", msg_p);
     
     CryptoPP::MD5 hash;
     byte checksum [ CryptoPP::MD5::DIGESTSIZE ];

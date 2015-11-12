@@ -28,20 +28,22 @@ void chat_connection::write(std::shared_ptr<chat_data_packet> packet)
 
 void chat_connection::disconnect()
 {
-    socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+    if (socket_.is_open())
+    {
+        socket_.close();
+    }
 }
 
 chat_connection::chat_connection(chat_client_controller *controller, tcp::socket socket) :
 controller_(controller),
 socket_ (std::move(socket)),
-read_state_(ReadState::Header)
-{
+read_state_(ReadState::Header){
 }
 
 void chat_connection::read()
 {
-    auto readHandler = boost::bind(&chat_connection::read_handler, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
-    auto completionHandler = boost::bind(&chat_connection::completion_handler, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto readHandler = boost::bind(&chat_connection::read_handler, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto completionHandler = boost::bind(&chat_connection::completion_handler, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
     boost::asio::async_read(socket_, read_buffer_, completionHandler, readHandler);
 }
 
@@ -52,7 +54,7 @@ void chat_connection::process_error(const std::string & message)
 
 void chat_connection::write_internal()
 {
-    auto writeHandler = boost::bind(&chat_connection::write_handler, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto writeHandler = boost::bind(&chat_connection::write_handler, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
     socket_.async_send(write_queue_.front()->Buffer(), writeHandler);
 }
 
@@ -108,12 +110,12 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
         }
     }
     
-    if (!controller_->SusspendRead(shared_chat_connection()))
+    if (!controller_->SusspendRead(shared_from_this()))
     {
         this->read();
     } else
     {
-        controller_->NotifySusspended(shared_chat_connection());
+        controller_->NotifySusspended(shared_from_this());
     }
 }
 
@@ -130,6 +132,10 @@ void chat_connection::write_handler(const boost::system::error_code& error, cons
     }
     
     write_queue_.pop();
+    
+    auto this_ptr = shared_from_this();
+    
+    Controller()->WriteCompleted(this_ptr);
     
     if (!write_queue_.empty())
     {
@@ -168,4 +174,8 @@ std::size_t chat_connection::completion_handler(const boost::system::error_code&
     }
     
     return total_bytes > expected_size ? 0 : expected_size - total_bytes;
+}
+
+chat_connection::~chat_connection()
+{
 }

@@ -8,6 +8,7 @@
 
 #include "chat_client_connection.h"
 
+#include "chat_client.h"
 #include "chat_message_client_notice.h"
 #include "chat_message_text2.h"
 
@@ -25,8 +26,8 @@ void chat_client_connection::start()
     if (!connect_notice_sent_)
     {
         connect_notice_sent_ = true;
-        chat_message_client_notice connect_notice(chat_message_client_notice::NoticeTypeEnum::Connected, name_);
-        write(chat_data_packet::Create(&connect_notice));
+        write(chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Connected, name_)));
+        Controller()->ClientConnected(shared_from_this(), std::string());
     }
     
     read();
@@ -38,16 +39,21 @@ bool chat_client_connection::process_message(std::shared_ptr<chat_message> messa
     {
         if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Connected)
         {
-            Controller()->ClientConnected(shared_chat_connection(), notice->Name());
+            Controller()->ClientConnected(shared_from_this(), notice->Name());
         }
         else if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Disconnected || notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity)
         {
-            Controller()->ClientDisconnected(shared_chat_connection(), notice->Name(), notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity);
+            Controller()->ClientDisconnected(shared_from_this(), notice->Name(), notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity);
+        }
+        else if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::NameAlreadyInUse)
+        {
+            auto client = dynamic_cast<chat_client*>(Controller());
+            client->NameAlreadyInUse();
         }
     }
     else if (auto text = std::dynamic_pointer_cast<chat_message_text2>(message))
     {
-        Controller()->TextReceived(shared_chat_connection(), text->Name(), text->Text());
+        Controller()->TextReceived(shared_from_this(), text->Name(), text->Text());
     }
     else
     {
@@ -60,5 +66,5 @@ bool chat_client_connection::process_message(std::shared_ptr<chat_message> messa
 
 void chat_client_connection::connection_closed()
 {
-    Controller()->ClientDisconnected(this->shared_chat_connection(), std::string(), false);
+    Controller()->ClientDisconnected(shared_from_this(), std::string(), false);
 }

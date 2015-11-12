@@ -18,7 +18,7 @@ class chat_data_packet
 public:
     chat_data_packet(std::shared_ptr<chat_message> message);
     
-    static std::shared_ptr<chat_data_packet> Create(const chat_message * msg);
+    static std::shared_ptr<chat_data_packet> Create(const chat_message & msg);
     
     static std::shared_ptr<chat_data_packet> Create(boost::asio::streambuf & buf);
     
@@ -31,8 +31,6 @@ public:
 
 private:
     chat_data_packet();
-    
-    void write_data(boost::asio::streambuf & buf);
     
     std::shared_ptr<chat_message> message_;
     boost::asio::streambuf buf_;
