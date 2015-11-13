@@ -6,6 +6,8 @@
 //  Copyright © 2015 Reinis. All rights reserved.
 //
 
+#include "app.h"
+
 #include "chat_connection.h"
 
 #include <cstdio>
@@ -34,10 +36,9 @@ void chat_connection::disconnect()
     }
 }
 
-chat_connection::chat_connection(chat_client_controller *controller, tcp::socket socket) :
-controller_(controller),
-socket_ (std::move(socket)),
-read_state_(ReadState::Header){
+chat_connection::chat_connection(tcp::socket socket) :
+    socket_ (std::move(socket)),
+    read_state_(ReadState::Header){
 }
 
 void chat_connection::read()
@@ -47,9 +48,9 @@ void chat_connection::read()
     boost::asio::async_read(socket_, read_buffer_, completionHandler, readHandler);
 }
 
-void chat_connection::process_error(const std::string & message)
+void chat_connection::on_error()
 {
-    
+    APP->controller()->ClientError(shared_from_this(), std::string());
 }
 
 void chat_connection::write_internal()
@@ -61,11 +62,15 @@ void chat_connection::write_internal()
 void chat_connection::read_handler(const boost::system::error_code& error, const size_t bytes_transferred)
 {
     if (error) {
-        std::cerr << "read error: " << boost::system::system_error(error).what() << std::endl;
+        APP->info(boost::format("chat_connection::read_handler() read error: %1%") % boost::system::system_error(error).what());
         
         if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
         {
             connection_closed();
+        }
+        else
+        {
+            on_error();
         }
         
         return;
@@ -80,7 +85,8 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
             
             if (body_size_ > 65535)
             {
-                std::cerr << "maximum message size exceeded " << std::endl;
+                APP->info("chat_connection::read_handler() maximum message size exceeded");
+                on_error();
                 return;
             }
             
@@ -98,10 +104,13 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
                 auto packet = chat_data_packet::Create(read_buffer_);
                 if (!process_message(packet->Message()))
                 {
+                    APP->info("chat_connection::read_handler() process_message failed");
+                    on_error();
                     return;
                 }
             } catch (...) {
-                std::cerr << "error in chat_data_packet::Create " << std::endl;
+                APP->info("chat_connection::read_handler() error in chat_data_packet::Create");
+                on_error();
                 return;
             }
             
@@ -110,24 +119,29 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
         }
     }
     
-    if (!controller_->SusspendRead(shared_from_this()))
+    if (!APP->controller()->SusspendRead(shared_from_this()))
     {
         this->read();
     } else
     {
-        controller_->NotifySusspended(shared_from_this());
+        APP->controller()->NotifySusspended(shared_from_this());
     }
 }
 
 void chat_connection::write_handler(const boost::system::error_code& error, const size_t bytes_transferred)
 {
     if (error) {
-        std::cerr << "write error: " << boost::system::system_error(error).what() << std::endl;
+        APP->info(boost::format("chat_connection::write_handler() write error: %1%") % boost::system::system_error(error).what());
         
         if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
         {
             connection_closed();
         }
+        else
+        {
+            on_error();
+        }
+        
         return;
     }
     
@@ -135,7 +149,7 @@ void chat_connection::write_handler(const boost::system::error_code& error, cons
     
     auto this_ptr = shared_from_this();
     
-    Controller()->WriteCompleted(this_ptr);
+    APP->controller()->WriteCompleted(this_ptr);
     
     if (!write_queue_.empty())
     {
@@ -146,11 +160,15 @@ void chat_connection::write_handler(const boost::system::error_code& error, cons
 std::size_t chat_connection::completion_handler(const boost::system::error_code& error, std::size_t bytes_transferred)
 {
     if (error) {
-        std::cerr << "completion_handler error: " << boost::system::system_error(error).what() << std::endl;
+        APP->info(boost::format("chat_connection::completion_handler() error: %1%") % boost::system::system_error(error).what());
         
         if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
         {
             connection_closed();
+        }
+        else
+        {
+            on_error();
         }
         
         return 0;

@@ -30,7 +30,7 @@ public:
     virtual ~chat_connection();
 
 protected:
-    chat_connection(chat_client_controller *controller, boost::asio::ip::tcp::socket socket);
+    chat_connection(boost::asio::ip::tcp::socket socket);
     
     void read();
     
@@ -38,9 +38,7 @@ protected:
     
     virtual void connection_closed() = 0;
     
-    void process_error(const std::string & message);
-    
-    chat_client_controller *Controller() const { return controller_; }
+    void on_error();
     
 private:
     enum class ReadState { Header, Body, Checksum };
@@ -54,7 +52,6 @@ private:
     std::size_t completion_handler(const boost::system::error_code& error, std::size_t bytes_transferred);
     
     std::queue<std::shared_ptr<chat_data_packet>> write_queue_;
-    chat_client_controller *controller_;
     ReadState read_state_;
     boost::asio::streambuf read_buffer_;
     size_t body_size_;

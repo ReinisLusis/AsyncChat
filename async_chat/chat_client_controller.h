@@ -13,7 +13,7 @@
 
 class chat_connection;
 
-class chat_client_controller
+class chat_client_controller : public std::enable_shared_from_this<chat_client_controller>
 {
 public:
     virtual void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) = 0;

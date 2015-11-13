@@ -6,6 +6,8 @@
 //  Copyright © 2015 Reinis. All rights reserved.
 //
 
+#include "server_app.h"
+
 #include "chat_server.h"
 
 #include "chat_connection.h"
@@ -31,7 +33,7 @@ chat_server::chat_server(boost::asio::io_service& io_service, const ServerOption
 void chat_server::on_signal(const boost::system::error_code& error, int signal_number)
 {
     if (error) {
-        std::cerr << "chat_client::on_signal error: " << boost::system::system_error(error).what() << std::endl;
+        APP->info(boost::format("chat_server::on_signal() error: %1%") % boost::system::system_error(error).what());
         return;
     }
     
@@ -101,7 +103,7 @@ void chat_server::RemoveClient(std::shared_ptr<chat_connection> client, const st
 
 void chat_server::TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text)
 {
-    std::cerr << "chat_server::TextReceived " << name << " - " << text << std::endl;
+    APP->info(boost::format("chat_server::TextReceived() %1%, %2%") % name % text);
     
     auto packet = chat_data_packet::Create(chat_message_text2(name, text));
     BroadcastPacket(packet, nullptr);
@@ -160,7 +162,7 @@ void chat_server::BroadcastPacket(std::shared_ptr<chat_data_packet> packet, std:
 void chat_server::on_resume_read_timer(const boost::system::error_code& error)
 {
     if (error) {
-        std::cerr << "chat_server::on_resume_read_timer error: " << boost::system::system_error(error).what() << std::endl;
+        APP->info(boost::format("chat_server::on_resume_read_timer() error: %1%") % boost::system::system_error(error).what());
         return;
     }
     
@@ -189,7 +191,7 @@ void chat_server::SusspendRead()
 {
     if (!susspend_read_)
     {
-        std::cerr << "chat_server::SusspendRead()" << std::endl;
+        APP->info("chat_server::SusspendRead()");
     
         auto timerHandler = boost::bind(&chat_server::on_resume_read_timer, this, boost::asio::placeholders::error);
         resume_read_timer.expires_from_now(boost::posix_time::seconds(options_.ResumeReadTimerTimeoutSeconds()));
@@ -203,8 +205,8 @@ void chat_server::ResumeRead()
 {
     if (susspend_read_)
     {
-        std::cerr << "chat_server::ResumeRead()" << std::endl;
-
+        APP->info("chat_server::ResumeRead()");
+        
         resume_read_timer.cancel();
         susspend_read_ = false;
         for (auto client : susspended_clients_)
@@ -225,13 +227,14 @@ void chat_server::accept_handler(const boost::system::error_code& error)
 {
     if (!error)
     {
-        auto client = std::make_shared<chat_server_connection>(this, io_service_, std::move(socket_));
+        auto client = std::make_shared<chat_server_connection>(io_service_, std::move(socket_));
         clients_.insert(client);
         client->start();
     }
     else
     {
-        std::cerr << "chat_server::accept_handler error: " << boost::system::system_error(error).what() << std::endl;
+        APP->info(boost::format("chat_server::accept_handler error: %1%") % boost::system::system_error(error).what());
+        io_service_.stop();
     }
     
     accept();

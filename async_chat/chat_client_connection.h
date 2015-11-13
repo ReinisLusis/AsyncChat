@@ -14,7 +14,7 @@
 class chat_client_connection : public chat_connection
 {
 public:
-    chat_client_connection(chat_client_controller *controller, boost::asio::io_service& io_service, const std::string & name, boost::asio::ip::tcp::socket socket);
+    chat_client_connection(boost::asio::io_service& io_service, const std::string & name, boost::asio::ip::tcp::socket socket);
     
     virtual void start() override;
 

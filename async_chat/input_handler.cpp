@@ -6,10 +6,9 @@
 //  Copyright © 2015 Reinis. All rights reserved.
 //
 
-#include "input_handler.h"
+#include "app.h"
 
-#include <cstdio>
-#include <iostream>
+#include "input_handler.h"
 
 #include <boost/bind.hpp>
 
@@ -28,7 +27,7 @@ void InputHandler::read()
 void InputHandler::read_handler(const boost::system::error_code& error, const size_t bytes_transferred)
 {
     if (error) {
-        std::cerr << "read error: " << boost::system::system_error(error).what() << std::endl;
+        APP->error(boost::format("inputHandler::read_handler() %1%") % boost::system::system_error(error).what());
         return;
     }
     

@@ -6,14 +6,18 @@
 //  Copyright © 2015 Reinis. All rights reserved.
 //
 
+#include "server_app.h"
+
 #include "chat_server_connection.h"
 
 #include "chat_server.h"
 #include "chat_message_client_notice.h"
 #include "chat_message_text.h"
 
-chat_server_connection::chat_server_connection(chat_client_controller *controller, boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket) :
-chat_connection(controller, std::move(socket)), timer_(io_service), client_notice_received_(false)
+chat_server_connection::chat_server_connection(boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket) :
+    chat_connection(std::move(socket)),
+    timer_(io_service),
+    client_notice_received_(false)
 {
 }
 
@@ -31,13 +35,13 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
         {
             if (notice->NoticeType() != chat_message_client_notice::NoticeTypeEnum::Connected)
             {
-                process_error("first message Connected notice expected");
+                APP->info("chat_server_connection::process_message() first message Connected notice expected");
                 return false;
             }
             
             if (notice->Name().empty())
             {
-                process_error("nick name is empty");
+                APP->info("chat_server_connection::process_message() nick name is empty");
                 return false;
             }
             
@@ -45,11 +49,11 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
             
             client_notice_received_ = true;
             
-            Controller()->ClientConnected(shared_from_this(), name_);
+            APP->controller()->ClientConnected(shared_from_this(), name_);
         }
         else
         {
-            process_error("first message connect notice expected");
+            APP->info("chat_server_connection::process_message() first message connect notice expected");
             return false;
         }
     }
@@ -57,11 +61,11 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
     {
         if (auto text = std::dynamic_pointer_cast<chat_message_text>(message))
         {
-            Controller()->TextReceived(shared_from_this(), name_, text->Text());
+            APP->controller()->TextReceived(shared_from_this(), name_, text->Text());
         }
         else
         {
-            process_error("only chat_message_text expected after notice");
+            APP->info("chat_server_connection::process_message() only chat_message_text expected after notice");
             return false;
         }
     }
@@ -73,24 +77,24 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
 
 void chat_server_connection::connection_closed()
 {
-    Controller()->ClientDisconnected(shared_from_this(), name_, false);
+    APP->controller()->ClientDisconnected(shared_from_this(), name_, false);
 }
 
 void chat_server_connection::setTimer()
 {
     auto timerHandler = boost::bind(&chat_server_connection::on_timer, std::dynamic_pointer_cast<chat_server_connection>(shared_from_this()), boost::asio::placeholders::error);
-    timer_.expires_from_now(boost::posix_time::seconds(dynamic_cast<chat_server*>(Controller())->Options().ClientInactivityTimeoutSeconds()));
+    timer_.expires_from_now(boost::posix_time::seconds(APP->Options().ClientInactivityTimeoutSeconds()));
     timer_.async_wait(timerHandler);
 }
 
 void chat_server_connection::on_timer(const boost::system::error_code& error)
 {
     if (error) {
-        std::cerr << "on_timer error: " << boost::system::system_error(error).what() << std::endl;
+        APP->info(boost::format("chat_server_connection::on_timer() on_timer error: %1%") % boost::system::system_error(error).what());
         return;
     }
     
-    Controller()->TimerExpired(shared_from_this(), name_);
+    APP->controller()->TimerExpired(shared_from_this(), name_);
 }
 
 void chat_server_connection::disconnect()

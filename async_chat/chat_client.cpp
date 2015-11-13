@@ -58,7 +58,7 @@ void chat_client::handle_connect(const boost::system::error_code& error)
     
     connect_timer_.cancel();
     
-    client_connection_ = std::make_shared<chat_client_connection>(this, io_service_, options_.Name(), std::move(socket_));
+    client_connection_ = std::make_shared<chat_client_connection>(io_service_, options_.Name(), std::move(socket_));
     client_connection_->start();
 }
 
