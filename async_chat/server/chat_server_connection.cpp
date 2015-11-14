@@ -14,34 +14,36 @@
 #include "chat_message_client_notice.h"
 #include "chat_message_text.h"
 
-chat_server_connection::chat_server_connection(boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket) :
-    chat_connection(std::move(socket)),
+namespace async_chat {
+    
+ChatServerConnection::ChatServerConnection(boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket) :
+    ChatConnection(std::move(socket)),
     timer_(io_service),
     client_notice_received_(false)
 {
 }
 
-void chat_server_connection::start()
+void ChatServerConnection::Start()
 {
-    setTimer();
-    read();
+    SetTimer();
+    Read();
 };
 
-bool chat_server_connection::process_message(std::shared_ptr<chat_message> message)
+bool ChatServerConnection::ProcessMessage(std::shared_ptr<ChatMessage> message)
 {
     if (!client_notice_received_)
     {
-        if (auto notice = std::dynamic_pointer_cast<chat_message_client_notice>(message))
+        if (auto notice = std::dynamic_pointer_cast<ChatMessageClientNotice>(message))
         {
-            if (notice->NoticeType() != chat_message_client_notice::NoticeTypeEnum::Connected)
+            if (notice->NoticeType() != ChatMessageClientNotice::NoticeTypeEnum::Connected)
             {
-                APP->info("chat_server_connection::process_message() first message Connected notice expected");
+                APP->Info("ChatServerConnection::ProcessMessage() first message Connected notice expected");
                 return false;
             }
             
             if (notice->Name().empty())
             {
-                APP->info("chat_server_connection::process_message() nick name is empty");
+                APP->Info("ChatServerConnection::ProcessMessage() nick name is empty");
                 return false;
             }
             
@@ -53,58 +55,59 @@ bool chat_server_connection::process_message(std::shared_ptr<chat_message> messa
         }
         else
         {
-            APP->info("chat_server_connection::process_message() first message connect notice expected");
+            APP->Info("ChatServerConnection::ProcessMessage() first message connect notice expected");
             return false;
         }
     }
     else
     {
-        if (auto text = std::dynamic_pointer_cast<chat_message_text>(message))
+        if (auto text = std::dynamic_pointer_cast<ChatMessageText>(message))
         {
             APP->controller()->TextReceived(shared_from_this(), name_, text->Text());
         }
         else
         {
-            APP->info("chat_server_connection::process_message() only chat_message_text expected after notice");
+            APP->Info("ChatServerConnection::ProcessMessage() only chat_message_text expected after notice");
             return false;
         }
     }
     
-    setTimer();
+    SetTimer();
     
     return true;
 }
 
-void chat_server_connection::connection_closed()
+void ChatServerConnection::OnConnectionClosed()
 {
     APP->controller()->ClientDisconnected(shared_from_this(), name_, false);
 }
 
-void chat_server_connection::setTimer()
+void ChatServerConnection::SetTimer()
 {
-    auto timerHandler = boost::bind(&chat_server_connection::on_timer, std::dynamic_pointer_cast<chat_server_connection>(shared_from_this()), boost::asio::placeholders::error);
+    auto timerHandler = boost::bind(&ChatServerConnection::OnTimer, std::dynamic_pointer_cast<ChatServerConnection>(shared_from_this()), boost::asio::placeholders::error);
     timer_.expires_from_now(boost::posix_time::seconds(APP->Options().ClientInactivityTimeoutSeconds()));
     timer_.async_wait(timerHandler);
 }
 
-void chat_server_connection::on_timer(const boost::system::error_code& error)
+void ChatServerConnection::OnTimer(const boost::system::error_code& error)
 {
     if (error) {
-        APP->info(boost::format("chat_server_connection::on_timer() on_timer error: %1%") % boost::system::system_error(error).what());
+        APP->Info(boost::format("ChatServerConnection::OnTimer() error: %1%") % boost::system::system_error(error).what());
         return;
     }
     
     APP->controller()->TimerExpired(shared_from_this(), name_);
 }
 
-void chat_server_connection::disconnect()
+void ChatServerConnection::Disconnect()
 {
     timer_.cancel();
-    chat_connection::disconnect();
+    ChatConnection::Disconnect();
 }
 
-void chat_server_connection::resumeRead()
+void ChatServerConnection::ResumeRead()
 {
-    read();
+    Read();
 }
 
+}

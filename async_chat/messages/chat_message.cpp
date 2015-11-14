@@ -8,6 +8,10 @@
 
 #include "chat_message.h"
 
-chat_message::~chat_message() {}
+namespace async_chat {
 
-chat_message::chat_message() {}
+ChatMessage::~ChatMessage() {}
+
+ChatMessage::ChatMessage() {}
+
+}

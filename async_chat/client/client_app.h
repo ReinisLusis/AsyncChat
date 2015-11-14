@@ -16,28 +16,31 @@
 
 #include <boost/asio.hpp>
 
-class ClientApp : public App
+namespace async_chat
 {
-public:
-    ClientApp(int argc, char ** argv);
-    
-    int run();
-    
-    const ClientOptions & Options() const;
-    
-    std::shared_ptr<chat_client> controller();
-    
-    virtual ~ClientApp() override;
-    
-private:
-    
-    virtual std::shared_ptr<chat_client_controller> get_controller() const override;
-    
-    boost::asio::io_service io_service_;
-    ClientOptions options_;
-    std::shared_ptr<chat_client> client_;
-    int options_result_;
-};
+    class ClientApp : public App
+    {
+    public:
+        ClientApp(int argc, char ** argv);
+        
+        int run();
+        
+        const ClientOptions & Options() const;
+        
+        std::shared_ptr<ChatClient> controller();
+        
+        virtual ~ClientApp() override;
+        
+    private:
+        
+        virtual std::shared_ptr<ChatClientController> GetController() const override;
+        
+        boost::asio::io_service io_service_;
+        ClientOptions options_;
+        std::shared_ptr<ChatClient> client_;
+        int options_result_;
+    };
+}
 
 #undef APP
 #define APP (dynamic_cast<ClientApp*>(App::instance()))

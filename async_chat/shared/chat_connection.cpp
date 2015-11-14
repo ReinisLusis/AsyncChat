@@ -13,14 +13,15 @@
 #include <cstdio>
 #include <boost/bind.hpp>
 
+namespace async_chat {
 using boost::asio::ip::tcp;
 
-void chat_connection::write(std::shared_ptr<chat_data_packet> packet)
+void ChatConnection::Write(std::shared_ptr<ChatDataPacket> packet)
 {
     if (write_queue_.empty())
     {
         write_queue_.push(packet);
-        write_internal();
+        WriteInternal();
     }
     else
     {
@@ -28,7 +29,7 @@ void chat_connection::write(std::shared_ptr<chat_data_packet> packet)
     }
 }
 
-void chat_connection::disconnect()
+void ChatConnection::Disconnect()
 {
     if (socket_.is_open())
     {
@@ -36,41 +37,41 @@ void chat_connection::disconnect()
     }
 }
 
-chat_connection::chat_connection(tcp::socket socket) :
+ChatConnection::ChatConnection(tcp::socket socket) :
     socket_ (std::move(socket)),
     read_state_(ReadState::Header){
 }
 
-void chat_connection::read()
+void ChatConnection::Read()
 {
-    auto readHandler = boost::bind(&chat_connection::read_handler, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
-    auto completionHandler = boost::bind(&chat_connection::completion_handler, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto readHandler = boost::bind(&ChatConnection::OnRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto completionHandler = boost::bind(&ChatConnection::OnCompletion, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
     boost::asio::async_read(socket_, read_buffer_, completionHandler, readHandler);
 }
 
-void chat_connection::on_error()
+void ChatConnection::OnError()
 {
     APP->controller()->ClientError(shared_from_this(), std::string());
 }
 
-void chat_connection::write_internal()
+void ChatConnection::WriteInternal()
 {
-    auto writeHandler = boost::bind(&chat_connection::write_handler, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto writeHandler = boost::bind(&ChatConnection::OnWrite, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
     socket_.async_send(write_queue_.front()->Buffer(), writeHandler);
 }
 
-void chat_connection::read_handler(const boost::system::error_code& error, const size_t bytes_transferred)
+void ChatConnection::OnRead(const boost::system::error_code& error, const size_t bytes_transferred)
 {
     if (error) {
-        APP->info(boost::format("chat_connection::read_handler() read error: %1%") % boost::system::system_error(error).what());
+        APP->Info(boost::format("ChatConnection::OnRead() error: %1%") % boost::system::system_error(error).what());
         
         if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
         {
-            connection_closed();
+            OnConnectionClosed();
         }
         else
         {
-            on_error();
+            OnError();
         }
         
         return;
@@ -83,10 +84,10 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
             auto data = boost::asio::buffer_cast<const unsigned char*>(read_buffer_.data());
             body_size_ = static_cast<size_t>(data[0]) << 24 | static_cast<size_t>(data[1]) << 16 | static_cast<size_t>(data[2]) << 8 | static_cast<size_t>(data[3]) << 0;
             
-            if (body_size_ > 65535)
+            if (body_size_ > ChatDataPacket::kMaxSizeLimit)
             {
-                APP->info("chat_connection::read_handler() maximum message size exceeded");
-                on_error();
+                APP->Info("ChatConnection::OnRead() maximum message size exceeded");
+                OnError();
                 return;
             }
             
@@ -101,16 +102,16 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
         case ReadState::Checksum:
         {
             try {
-                auto packet = chat_data_packet::Create(read_buffer_);
-                if (!process_message(packet->Message()))
+                auto packet = ChatDataPacket::Create(read_buffer_);
+                if (!ProcessMessage(packet->Message()))
                 {
-                    APP->info("chat_connection::read_handler() process_message failed");
-                    on_error();
+                    APP->Info("ChatConnection::OnRead() process_message failed");
+                    OnError();
                     return;
                 }
             } catch (...) {
-                APP->info("chat_connection::read_handler() error in chat_data_packet::Create");
-                on_error();
+                APP->Info("ChatConnection::OnRead() error in chat_data_packet::Create");
+                OnError();
                 return;
             }
             
@@ -121,25 +122,25 @@ void chat_connection::read_handler(const boost::system::error_code& error, const
     
     if (!APP->controller()->SusspendRead(shared_from_this()))
     {
-        this->read();
+        this->Read();
     } else
     {
         APP->controller()->NotifySusspended(shared_from_this());
     }
 }
 
-void chat_connection::write_handler(const boost::system::error_code& error, const size_t bytes_transferred)
+void ChatConnection::OnWrite(const boost::system::error_code& error, const size_t bytes_transferred)
 {
     if (error) {
-        APP->info(boost::format("chat_connection::write_handler() write error: %1%") % boost::system::system_error(error).what());
+        APP->Info(boost::format("ChatConnection::OnWrite() error: %1%") % boost::system::system_error(error).what());
         
         if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
         {
-            connection_closed();
+            OnConnectionClosed();
         }
         else
         {
-            on_error();
+            OnError();
         }
         
         return;
@@ -153,22 +154,22 @@ void chat_connection::write_handler(const boost::system::error_code& error, cons
     
     if (!write_queue_.empty())
     {
-        write_internal();
+        WriteInternal();
     }
 }
 
-std::size_t chat_connection::completion_handler(const boost::system::error_code& error, std::size_t bytes_transferred)
+std::size_t ChatConnection::OnCompletion(const boost::system::error_code& error, std::size_t bytes_transferred)
 {
     if (error) {
-        APP->info(boost::format("chat_connection::completion_handler() error: %1%") % boost::system::system_error(error).what());
+        APP->Info(boost::format("ChatConnection::OnCompletion() error: %1%") % boost::system::system_error(error).what());
         
         if (error == boost::asio::error::eof || error == boost::asio::error::connection_reset)
         {
-            connection_closed();
+            OnConnectionClosed();
         }
         else
         {
-            on_error();
+            OnError();
         }
         
         return 0;
@@ -180,20 +181,22 @@ std::size_t chat_connection::completion_handler(const boost::system::error_code&
     switch (read_state_)
     {
         case ReadState::Header:
-            expected_size = chat_data_packet::HeaderSize;
+            expected_size = ChatDataPacket::kHeaderSize;
             break;
             
         case ReadState::Body:
-            expected_size = chat_data_packet::HeaderSize + body_size_;
+            expected_size = ChatDataPacket::kHeaderSize + body_size_;
             break;
         case ReadState::Checksum:
-            expected_size = chat_data_packet::HeaderSize + body_size_ + chat_data_packet::ChecksumSize;
+            expected_size = ChatDataPacket::kHeaderSize + body_size_ + ChatDataPacket::kChecksumSize;
             break;
     }
     
     return total_bytes > expected_size ? 0 : expected_size - total_bytes;
 }
 
-chat_connection::~chat_connection()
+ChatConnection::~ChatConnection()
 {
+}
+
 }

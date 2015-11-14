@@ -11,19 +11,21 @@
 
 #include <string>
 
-class chat_connection;
-
-class chat_client_controller : public std::enable_shared_from_this<chat_client_controller>
+namespace async_chat
 {
-public:
-    virtual void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) = 0;
-    virtual void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity) = 0;
-    virtual void ClientError(std::shared_ptr<chat_connection> client, const std::string & name) = 0;
-    virtual void WriteCompleted(std::shared_ptr<chat_connection> client) = 0;
-    virtual void TimerExpired(std::shared_ptr<chat_connection> client, const std::string & name) = 0;
-    virtual void TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text) = 0;
-    virtual bool SusspendRead(std::shared_ptr<chat_connection> client) = 0;
-    virtual void NotifySusspended(std::shared_ptr<chat_connection> client) = 0;
-};
+    class ChatConnection;
 
+    class ChatClientController : public std::enable_shared_from_this<ChatClientController>
+    {
+    public:
+        virtual void ClientConnected(std::shared_ptr<ChatConnection> client, const std::string & name) = 0;
+        virtual void ClientDisconnected(std::shared_ptr<ChatConnection> client, const std::string & name, bool inactivity) = 0;
+        virtual void ClientError(std::shared_ptr<ChatConnection> client, const std::string & name) = 0;
+        virtual void WriteCompleted(std::shared_ptr<ChatConnection> client) = 0;
+        virtual void TimerExpired(std::shared_ptr<ChatConnection> client, const std::string & name) = 0;
+        virtual void TextReceived(std::shared_ptr<ChatConnection> client, const std::string name, const std::string & text) = 0;
+        virtual bool SusspendRead(std::shared_ptr<ChatConnection> client) = 0;
+        virtual void NotifySusspended(std::shared_ptr<ChatConnection> client) = 0;
+    };
+}
 #endif /* chat_client_controller_h */

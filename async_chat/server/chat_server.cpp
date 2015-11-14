@@ -17,23 +17,25 @@
 
 #include <boost/bind.hpp>
 
-chat_server::chat_server(boost::asio::io_service& io_service, const ServerOptions & options) :
+namespace async_chat {
+    
+ChatServer::ChatServer(boost::asio::io_service& io_service, const ServerOptions & options) :
     options_(options),
     signal_set_(io_service, SIGINT, SIGTERM),
     acceptor_(io_service, options.Endpoint()),
     io_service_(io_service),
     socket_(io_service),
     susspend_read_(false),
-    resume_read_timer(io_service)
+    resume_read_timer_(io_service)
 {
-    auto signalHandler = boost::bind(&chat_server::on_signal, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number);
+    auto signalHandler = boost::bind(&ChatServer::OnSignal, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number);
     signal_set_.async_wait(signalHandler);
 }
 
-void chat_server::on_signal(const boost::system::error_code& error, int signal_number)
+void ChatServer::OnSignal(const boost::system::error_code& error, int signal_number)
 {
     if (error) {
-        APP->info(boost::format("chat_server::on_signal() error: %1%") % boost::system::system_error(error).what());
+        APP->Info(boost::format("ChatServer::OnSignal() error: %1%") % boost::system::system_error(error).what());
         return;
     }
     
@@ -43,7 +45,7 @@ void chat_server::on_signal(const boost::system::error_code& error, int signal_n
     io_service_.stop();
 }
 
-void chat_server::ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name)
+void ChatServer::ClientConnected(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
     if (client_names_.find(name) == client_names_.end())
     {
@@ -52,48 +54,48 @@ void chat_server::ClientConnected(std::shared_ptr<chat_connection> client, const
     else
     {
         disconnect_on_write_completed_clients_.insert(client);
-        client->write(chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::NameAlreadyInUse, name)));
+        client->Write(ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::NameAlreadyInUse, name)));
     }
 };
 
-void chat_server::ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity)
+void ChatServer::ClientDisconnected(std::shared_ptr<ChatConnection> client, const std::string & name, bool inactivity)
 {
     RemoveClient(client, name);
     
-    auto packet = chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name));
+    auto packet = ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::Disconnected, name));
     BroadcastPacket(packet, client);
 };
 
-void chat_server::WriteCompleted(std::shared_ptr<chat_connection> client)
+void ChatServer::WriteCompleted(std::shared_ptr<ChatConnection> client)
 {
     if (disconnect_on_write_completed_clients_.find(client) != disconnect_on_write_completed_clients_.end())
     {
-        client->disconnect();
+        client->Disconnect();
     }
 }
 
-void chat_server::ClientError(std::shared_ptr<chat_connection> client, const std::string & name)
+void ChatServer::ClientError(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
     RemoveClient(client, name);
-    client->disconnect();
+    client->Disconnect();
     
-    auto packet = chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Disconnected, name));
+    auto packet = ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::Disconnected, name));
     BroadcastPacket(packet, client);
 };
 
-void chat_server::TimerExpired(std::shared_ptr<chat_connection> client, const std::string & name)
+void ChatServer::TimerExpired(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
     RemoveClient(client, name);
-    client->disconnect();
+    client->Disconnect();
     
     if (!name.empty())
     {
-        auto packet = chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity, name));
+        auto packet = ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::DisconnectedDueInactivity, name));
         BroadcastPacket(packet, client);
     }
 }
 
-void chat_server::RemoveClient(std::shared_ptr<chat_connection> client, const std::string & name)
+void ChatServer::RemoveClient(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
     client_names_.erase(name);
     susspended_clients_.erase(client);
@@ -101,15 +103,15 @@ void chat_server::RemoveClient(std::shared_ptr<chat_connection> client, const st
     clients_.erase(client);
 }
 
-void chat_server::TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text)
+void ChatServer::TextReceived(std::shared_ptr<ChatConnection> client, const std::string name, const std::string & text)
 {
-    APP->info(boost::format("chat_server::TextReceived() %1%, %2%") % name % text);
+    APP->Info(boost::format("ChatServer::TextReceived() %1%, %2%") % name % text);
     
-    auto packet = chat_data_packet::Create(chat_message_text2(name, text));
+    auto packet = ChatDataPacket::Create(ChatMessageText2(name, text));
     BroadcastPacket(packet, nullptr);
 };
 
-bool chat_server::SusspendRead(std::shared_ptr<chat_connection> client)
+bool ChatServer::SusspendRead(std::shared_ptr<ChatConnection> client)
 {
     if (disconnect_on_write_completed_clients_.find(client) != disconnect_on_write_completed_clients_.end())
     {
@@ -119,7 +121,7 @@ bool chat_server::SusspendRead(std::shared_ptr<chat_connection> client)
     return susspend_read_;
 };
 
-void chat_server::NotifySusspended(std::shared_ptr<chat_connection> client)
+void ChatServer::NotifySusspended(std::shared_ptr<ChatConnection> client)
 {
     if (disconnect_on_write_completed_clients_.find(client) == disconnect_on_write_completed_clients_.end())
     {
@@ -127,7 +129,7 @@ void chat_server::NotifySusspended(std::shared_ptr<chat_connection> client)
     }
 };
 
-void chat_server::BroadcastPacket(std::shared_ptr<chat_data_packet> packet, std::shared_ptr<chat_connection> excludeClient)
+void ChatServer::BroadcastPacket(std::shared_ptr<ChatDataPacket> packet, std::shared_ptr<ChatConnection> excludeClient)
 {
     size_t total_queued_message_count = 0;
     
@@ -137,11 +139,11 @@ void chat_server::BroadcastPacket(std::shared_ptr<chat_data_packet> packet, std:
         {
             if (client->queued_message_count() < Options().ClientMaxMessageCount())
             {
-                client->write(packet);
+                client->Write(packet);
             }
             else
             {
-                client->disconnect();
+                client->Disconnect();
             }
             
             total_queued_message_count += client->queued_message_count();
@@ -159,10 +161,10 @@ void chat_server::BroadcastPacket(std::shared_ptr<chat_data_packet> packet, std:
     }
 }
 
-void chat_server::on_resume_read_timer(const boost::system::error_code& error)
+void ChatServer::OnResumeReadTimer(const boost::system::error_code& error)
 {
     if (error) {
-        APP->info(boost::format("chat_server::on_resume_read_timer() error: %1%") % boost::system::system_error(error).what());
+        APP->Info(boost::format("ChatServer::OnResumeReadTimer() error: %1%") % boost::system::system_error(error).what());
         return;
     }
     
@@ -177,9 +179,9 @@ void chat_server::on_resume_read_timer(const boost::system::error_code& error)
         (total_queued_message_count / clients_.size() > Options().AverageWriteQueueLengthPerClientBeforeSusspend()))
     {
         // keep susspended, just retriger timer
-        auto timerHandler = boost::bind(&chat_server::on_resume_read_timer, this, boost::asio::placeholders::error);
-        resume_read_timer.expires_from_now(boost::posix_time::seconds(options_.ResumeReadTimerTimeoutSeconds()));
-        resume_read_timer.async_wait(timerHandler);
+        auto timerHandler = boost::bind(&ChatServer::OnResumeReadTimer, this, boost::asio::placeholders::error);
+        resume_read_timer_.expires_from_now(boost::posix_time::seconds(options_.ResumeReadTimerTimeoutSeconds()));
+        resume_read_timer_.async_wait(timerHandler);
     }
     else
     {
@@ -187,55 +189,57 @@ void chat_server::on_resume_read_timer(const boost::system::error_code& error)
     }
 }
 
-void chat_server::SusspendRead()
+void ChatServer::SusspendRead()
 {
     if (!susspend_read_)
     {
-        APP->info("chat_server::SusspendRead()");
+        APP->Info("ChatServer::SusspendRead()");
     
-        auto timerHandler = boost::bind(&chat_server::on_resume_read_timer, this, boost::asio::placeholders::error);
-        resume_read_timer.expires_from_now(boost::posix_time::seconds(options_.ResumeReadTimerTimeoutSeconds()));
-        resume_read_timer.async_wait(timerHandler);
+        auto timerHandler = boost::bind(&ChatServer::OnResumeReadTimer, this, boost::asio::placeholders::error);
+        resume_read_timer_.expires_from_now(boost::posix_time::seconds(options_.ResumeReadTimerTimeoutSeconds()));
+        resume_read_timer_.async_wait(timerHandler);
         
         susspend_read_ = true;
     }
 }
 
-void chat_server::ResumeRead()
+void ChatServer::ResumeRead()
 {
     if (susspend_read_)
     {
-        APP->info("chat_server::ResumeRead()");
+        APP->Info("ChatServer::ResumeRead()");
         
-        resume_read_timer.cancel();
+        resume_read_timer_.cancel();
         susspend_read_ = false;
         for (auto client : susspended_clients_)
         {
-            std::dynamic_pointer_cast<chat_server_connection>(client)->resumeRead();
+            std::dynamic_pointer_cast<ChatServerConnection>(client)->ResumeRead();
         }
         susspended_clients_.clear();
     }
 }
 
-void chat_server::accept()
+void ChatServer::Accept()
 {
-    auto acceptHandler = boost::bind(&chat_server::accept_handler, this, boost::asio::placeholders::error);
+    auto acceptHandler = boost::bind(&ChatServer::OnAccept, this, boost::asio::placeholders::error);
     acceptor_.async_accept(socket_, acceptHandler);
 }
 
-void chat_server::accept_handler(const boost::system::error_code& error)
+void ChatServer::OnAccept(const boost::system::error_code& error)
 {
     if (!error)
     {
-        auto client = std::make_shared<chat_server_connection>(io_service_, std::move(socket_));
+        auto client = std::make_shared<ChatServerConnection>(io_service_, std::move(socket_));
         clients_.insert(client);
-        client->start();
+        client->Start();
     }
     else
     {
-        APP->info(boost::format("chat_server::accept_handler error: %1%") % boost::system::system_error(error).what());
+        APP->Info(boost::format("ChatServer::OnAccept() error: %1%") % boost::system::system_error(error).what());
         io_service_.stop();
     }
     
-    accept();
+    Accept();
+}
+    
 }

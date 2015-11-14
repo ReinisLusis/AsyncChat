@@ -13,27 +13,30 @@
 
 #include <boost/asio.hpp>
 
-class chat_data_packet
+namespace async_chat
 {
-public:
-    chat_data_packet(std::shared_ptr<chat_message> message);
-    
-    static std::shared_ptr<chat_data_packet> Create(const chat_message & msg);
-    
-    static std::shared_ptr<chat_data_packet> Create(boost::asio::streambuf & buf);
-    
-    boost::asio::const_buffers_1 Buffer() const { return boost::asio::buffer(buf_.data(), buf_.size()); }
-    
-    std::shared_ptr<chat_message> Message() const { return message_; }
-    
-    static const size_t HeaderSize;
-    static const size_t ChecksumSize;
+    class ChatDataPacket
+    {
+    public:
+        ChatDataPacket(std::shared_ptr<ChatMessage> message);
+        
+        static std::shared_ptr<ChatDataPacket> Create(const ChatMessage & msg);
+        
+        static std::shared_ptr<ChatDataPacket> Create(boost::asio::streambuf & buf);
+        
+        boost::asio::const_buffers_1 Buffer() const { return boost::asio::buffer(buf_.data(), buf_.size()); }
+        
+        std::shared_ptr<ChatMessage> Message() const { return message_; }
+        
+        static const size_t kHeaderSize;
+        static const size_t kChecksumSize;
+        static const size_t kMaxSizeLimit;
 
-private:
-    chat_data_packet();
-    
-    std::shared_ptr<chat_message> message_;
-    boost::asio::streambuf buf_;
-};
-
+    private:
+        ChatDataPacket();
+        
+        std::shared_ptr<ChatMessage> message_;
+        boost::asio::streambuf buf_;
+    };
+}
 #endif /* chat_data_packet_h */

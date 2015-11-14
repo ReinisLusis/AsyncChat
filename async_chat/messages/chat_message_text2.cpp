@@ -8,14 +8,18 @@
 
 #include "chat_message_text2.h"
 
-chat_message_text2::chat_message_text2(const std::string & name, const std::string & text) : name_(name), chat_message_text(text) {}
+namespace async_chat {
+    
+ChatMessageText2::ChatMessageText2(const std::string & name, const std::string & text) : name_(name), ChatMessageText(text) {}
 
-const std::string & chat_message_text2::Name() const { return name_; }
+const std::string & ChatMessageText2::Name() const { return name_; }
 
-chat_message_text2::chat_message_text2() {}
+ChatMessageText2::ChatMessageText2() {}
 
 
-chat_message_text2::~chat_message_text2() {}
+ChatMessageText2::~ChatMessageText2() {}
+
+}
 
 
 

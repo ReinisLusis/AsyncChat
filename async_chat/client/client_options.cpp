@@ -12,6 +12,8 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 
+namespace async_chat {
+    
 using boost::asio::ip::tcp;
 
 ClientOptions::ClientOptions(boost::asio::io_service & io_service) : resolver_(io_service)
@@ -120,4 +122,5 @@ int ClientOptions::ReconnectWaitMilliseconds() const
     return 5000;
 }
 
+}
 

@@ -12,38 +12,42 @@
 
 #include <boost/bind.hpp>
 
-InputHandler::InputHandler( boost::asio::io_service& io_service, chat_client_controller &controller) : _input(io_service), controller_(controller)
+namespace async_chat {
+    
+InputHandler::InputHandler( boost::asio::io_service& io_service, ChatClientController &controller) : input_(io_service), controller_(controller)
 {
-    _input.assign( STDIN_FILENO );
-    read();
+    input_.assign( STDIN_FILENO );
+    Read();
 }
 
-void InputHandler::read()
+void InputHandler::Read()
 {
-    auto readHandler = boost::bind(&InputHandler::read_handler, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
-    boost::asio::async_read(_input, boost::asio::buffer(&_command, sizeof(_command)), readHandler);
+    auto readHandler = boost::bind(&InputHandler::OnRead, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    boost::asio::async_read(input_, boost::asio::buffer(&command_, sizeof(command_)), readHandler);
 }
 
-void InputHandler::read_handler(const boost::system::error_code& error, const size_t bytes_transferred)
+void InputHandler::OnRead(const boost::system::error_code& error, const size_t bytes_transferred)
 {
     if (error) {
-        APP->error(boost::format("inputHandler::read_handler() %1%") % boost::system::system_error(error).what());
+        APP->Error(boost::format("inputHandler::OnRead() error %1%") % boost::system::system_error(error).what());
         return;
     }
     
-    if (_command == '\n')
+    if (command_ == '\n')
     {
-        boost::asio::streambuf::const_buffers_type buf = _input_buffer.data();
+        boost::asio::streambuf::const_buffers_type buf = input_buffer_.data();
         std::string str(boost::asio::buffers_begin(buf), boost::asio::buffers_end(buf));
-        _input_buffer.consume(_input_buffer.size());
+        input_buffer_.consume(input_buffer_.size());
         
         controller_.TextReceived(nullptr, std::string(), str);
     }
     else
     {
-        std::ostream os (&_input_buffer);
-        os << _command;
+        std::ostream os (&input_buffer_);
+        os << command_;
     }
     
-    this->read();
+    this->Read();
+}
+
 }

@@ -14,18 +14,20 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 
-class chat_message
+namespace async_chat
 {
-public:
-    virtual ~chat_message();
+    class ChatMessage
+    {
+    public:
+        virtual ~ChatMessage();
 
-protected:
-    chat_message();
-    
-private:
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version) {}
-};
-
+    protected:
+        ChatMessage();
+        
+    private:
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version) {}
+    };
+}
 #endif /* chat_message_h */

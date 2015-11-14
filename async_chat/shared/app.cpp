@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <iostream>
 
+namespace async_chat {
+    
 App *App::instance_ = nullptr;
 
 App::App()
@@ -23,22 +25,22 @@ App::~App()
     
 }
 
-void App::info(const std::string & message) const
+void App::Info(const std::string & message) const
 {
     std::cerr << message << std::endl;
 }
 
-void App::error(const std::string & message) const
+void App::Error(const std::string & message) const
 {
     std::cerr << message << std::endl;
 }
 
-std::shared_ptr<chat_client_controller> App::controller() const
+std::shared_ptr<ChatClientController> App::controller() const
 {
-    return get_controller();
+    return GetController();
 }
 
-void App::output(const std::string & message) const
+void App::Output(const std::string & message) const
 {
     std::cout << message << std::endl;
 }
@@ -48,8 +50,9 @@ App* App::instance()
     return instance_;
 }
 
-void App::set_instance(App *instance)
+void App::SetInstance(App *instance)
 {
     instance_ = instance;
 }
 
+}

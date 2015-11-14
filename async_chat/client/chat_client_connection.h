@@ -11,21 +11,24 @@
 
 #include "../shared/chat_connection.h"
 
-class chat_client_connection : public chat_connection
+namespace async_chat
 {
-public:
-    chat_client_connection(boost::asio::io_service& io_service, const std::string & name, boost::asio::ip::tcp::socket socket);
-    
-    virtual void start() override;
+    class ChatClientConnection : public ChatConnection
+    {
+    public:
+        ChatClientConnection(boost::asio::io_service& io_service, const std::string & name, boost::asio::ip::tcp::socket socket);
+        
+        virtual void Start() override;
 
-protected:
-    virtual bool process_message(std::shared_ptr<chat_message> message) override;
-    virtual void connection_closed() override;
-    
-private:
-    bool connect_notice_sent_;
-    std::string name_;
-    boost::asio::deadline_timer timer_;
-};
+    protected:
+        virtual bool ProcessMessage(std::shared_ptr<ChatMessage> message) override;
+        virtual void OnConnectionClosed() override;
+        
+    private:
+        bool connect_notice_sent_;
+        std::string name_;
+        boost::asio::deadline_timer timer_;
+    };
+}
 
 #endif /* chat_client_connection_h */

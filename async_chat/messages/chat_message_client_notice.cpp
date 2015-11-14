@@ -8,15 +8,16 @@
 
 #include "chat_message_client_notice.h"
 
-chat_message_client_notice::chat_message_client_notice(const NoticeTypeEnum & noticeType, const std::string & name) : notice_type_(noticeType), name_(name) {}
+namespace async_chat {
+    
+ChatMessageClientNotice::ChatMessageClientNotice(const NoticeTypeEnum & noticeType, const std::string & name) : notice_type_(noticeType), name_(name) {}
 
-chat_message_client_notice::NoticeTypeEnum chat_message_client_notice::NoticeType() const { return notice_type_; };
+ChatMessageClientNotice::NoticeTypeEnum ChatMessageClientNotice::NoticeType() const { return notice_type_; };
 
-const std::string & chat_message_client_notice::Name() const { return name_; }
+const std::string & ChatMessageClientNotice::Name() const { return name_; }
 
-chat_message_client_notice::~chat_message_client_notice() {}
+ChatMessageClientNotice::~ChatMessageClientNotice() {}
 
-chat_message_client_notice::chat_message_client_notice() {}
+ChatMessageClientNotice::ChatMessageClientNotice() {}
 
-
-
+}

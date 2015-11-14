@@ -13,18 +13,20 @@
 
 #include <boost/asio.hpp>
 
-class InputHandler {
-public:
-    InputHandler(boost::asio::io_service& io_service, chat_client_controller & controller);
+namespace async_chat
+{
+    class InputHandler {
+    public:
+        InputHandler(boost::asio::io_service& io_service, ChatClientController & controller);
 
-private:
-    void read();
-    void read_handler(const boost::system::error_code& error, const size_t bytes_transferred);
-    
-    boost::asio::streambuf _input_buffer;
-    boost::asio::posix::stream_descriptor _input;
-    chat_client_controller & controller_;
-    char _command;
-};
-
+    private:
+        void Read();
+        void OnRead(const boost::system::error_code& error, const size_t bytes_transferred);
+        
+        boost::asio::streambuf input_buffer_;
+        boost::asio::posix::stream_descriptor input_;
+        ChatClientController & controller_;
+        char command_;
+    };
+}
 #endif /* input_handler_h */

@@ -11,29 +11,32 @@
 
 #include "chat_message_text.h"
 
-class chat_message_text2 : public chat_message_text
+namespace async_chat
 {
-public:
-    chat_message_text2(const std::string & name, const std::string & text);
-    
-    const std::string & Name() const;
-    
-    
-    virtual ~chat_message_text2();
-protected:
-    chat_message_text2();
-    
-    std::string name_;    
-   
-private:
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
+    class ChatMessageText2 : public ChatMessageText
     {
-        ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(chat_message_text);
-        ar & BOOST_SERIALIZATION_NVP(name_);
-        ar & BOOST_SERIALIZATION_NVP(text_);
-    }
-};
+    public:
+        ChatMessageText2(const std::string & name, const std::string & text);
+        
+        const std::string & Name() const;
+        
+        
+        virtual ~ChatMessageText2();
+    protected:
+        ChatMessageText2();
+        
+        std::string name_;    
+       
+    private:
+        friend class boost::serialization::access;
+        template<class Archive>
+        void serialize(Archive & ar, const unsigned int version)
+        {
+            ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ChatMessageText);
+            ar & BOOST_SERIALIZATION_NVP(name_);
+            ar & BOOST_SERIALIZATION_NVP(text_);
+        }
+    };
+}
 
 #endif /* chat_message_text2_h */

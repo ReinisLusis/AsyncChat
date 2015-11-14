@@ -13,44 +13,46 @@
 #include "chat_message_text2.h"
 
 #include <boost/serialization/shared_ptr.hpp>
-
-BOOST_SERIALIZATION_SHARED_PTR(chat_message)
-BOOST_CLASS_EXPORT_GUID(chat_message, "chat_message")
-BOOST_CLASS_EXPORT_GUID(chat_message_text, "chat_message_text")
-BOOST_CLASS_EXPORT_GUID(chat_message_text2, "chat_message_text2")
-BOOST_CLASS_EXPORT_GUID(chat_message_client_notice, "chat_message_client_notice")
-
-#include <cryptopp/md5.h>
 #include <boost/iostreams/copy.hpp>
+#include <cryptopp/md5.h>
 
-const size_t chat_data_packet::HeaderSize = 4;
-const size_t chat_data_packet::ChecksumSize = CryptoPP::MD5::DIGESTSIZE;
+BOOST_SERIALIZATION_SHARED_PTR(async_chat::ChatMessage)
+BOOST_CLASS_EXPORT_GUID(async_chat::ChatMessage, "chat_message")
+BOOST_CLASS_EXPORT_GUID(async_chat::ChatMessageText, "chat_message_text")
+BOOST_CLASS_EXPORT_GUID(async_chat::ChatMessageText2, "chat_message_text2")
+BOOST_CLASS_EXPORT_GUID(async_chat::ChatMessageClientNotice, "chat_message_client_notice")
 
-chat_data_packet::chat_data_packet(std::shared_ptr<chat_message> message) : message_(message)
+namespace async_chat {
+
+const size_t ChatDataPacket::kHeaderSize = 4;
+const size_t ChatDataPacket::kChecksumSize = CryptoPP::MD5::DIGESTSIZE;
+const size_t ChatDataPacket::kMaxSizeLimit = 65535;
+
+ChatDataPacket::ChatDataPacket(std::shared_ptr<ChatMessage> message) : message_(message)
 {
 }
 
-chat_data_packet::chat_data_packet()
+ChatDataPacket::ChatDataPacket()
 {
 }
 
-std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message & msg)
+std::shared_ptr<ChatDataPacket> ChatDataPacket::Create(const ChatMessage & msg)
 {
     boost::asio::streambuf msg_buf;
     std::ostream msg_stream(&msg_buf);
     boost::archive::xml_oarchive msg_archive(msg_stream);
-    msg_archive.template register_type<chat_message>();
-    msg_archive.template register_type<chat_message_client_notice>();
-    msg_archive.template register_type<chat_message_text>();
-    msg_archive.template register_type<chat_message_text2>();
-    const chat_message * msg_p = &msg;
+    msg_archive.template register_type<ChatMessage>();
+    msg_archive.template register_type<ChatMessageClientNotice>();
+    msg_archive.template register_type<ChatMessageText>();
+    msg_archive.template register_type<ChatMessageText2>();
+    const ChatMessage * msg_p = &msg;
     msg_archive << boost::serialization::make_nvp("item", msg_p);
     
     CryptoPP::MD5 hash;
     byte checksum [ CryptoPP::MD5::DIGESTSIZE ];
     hash.CalculateDigest(checksum, boost::asio::buffer_cast<const byte*>(msg_buf.data()), msg_buf.size());
     
-    auto retVal = std::shared_ptr<chat_data_packet>(new chat_data_packet());
+    auto retVal = std::shared_ptr<ChatDataPacket>(new ChatDataPacket());
     std::ostream os(&retVal->buf_);
     
     os << static_cast<unsigned char>((msg_buf.size() >> 24) & 0xFF);
@@ -65,7 +67,7 @@ std::shared_ptr<chat_data_packet> chat_data_packet::Create(const chat_message & 
     return retVal;
 }
 
-std::shared_ptr<chat_data_packet> chat_data_packet::Create(boost::asio::streambuf & buf)
+std::shared_ptr<ChatDataPacket> ChatDataPacket::Create(boost::asio::streambuf & buf)
 {
     std::istream in(&buf);
     
@@ -82,12 +84,12 @@ std::shared_ptr<chat_data_packet> chat_data_packet::Create(boost::asio::streambu
         throw std::exception();
     }
 
-    chat_message *message;
+    ChatMessage *message;
     boost::archive::xml_iarchive i(in);
-    i.template register_type<chat_message>();
-    i.template register_type<chat_message_client_notice>();
-    i.template register_type<chat_message_text>();
-    i.template register_type<chat_message_text2>();
+    i.template register_type<ChatMessage>();
+    i.template register_type<ChatMessageClientNotice>();
+    i.template register_type<ChatMessageText>();
+    i.template register_type<ChatMessageText2>();
     i >> boost::serialization::make_nvp("item", message);
     
     if (message == nullptr) {
@@ -96,5 +98,7 @@ std::shared_ptr<chat_data_packet> chat_data_packet::Create(boost::asio::streambu
     
     buf.consume(CryptoPP::MD5::DIGESTSIZE);
     
-    return std::make_shared<chat_data_packet>(std::shared_ptr<chat_message>(message));
+    return std::make_shared<ChatDataPacket>(std::shared_ptr<ChatMessage>(message));
+}
+    
 }

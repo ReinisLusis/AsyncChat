@@ -13,40 +13,42 @@
 
 #include <boost/format.hpp>
 
-class App
+namespace async_chat
 {
-public:
-    std::shared_ptr<chat_client_controller> controller() const;
-    
-    void info(const std::string & message) const;
-    
-    void info(const boost::format & format) const { info(boost::str(format)); }
-    
-    void error(const std::string & message) const;
-    
-    void error(const boost::format & format) const { error(boost::str(format)); }
-    
-    void output(const std::string & message) const;
-    
-    void output(const boost::format & format) const { output(boost::str(format)); }
-    
-    static App* instance();
-    
-protected:
-    
-    App();
-    
-    virtual ~App();
-    
-    void set_instance(App *instance);
-    
-    virtual std::shared_ptr<chat_client_controller> get_controller() const = 0;
-    
-private:
-    
-    static App *instance_;
-};
-
+    class App
+    {
+    public:
+        std::shared_ptr<ChatClientController> controller() const;
+        
+        void Info(const std::string & message) const;
+        
+        void Info(const boost::format & format) const { Info(boost::str(format)); }
+        
+        void Error(const std::string & message) const;
+        
+        void Error(const boost::format & format) const { Error(boost::str(format)); }
+        
+        void Output(const std::string & message) const;
+        
+        void Output(const boost::format & format) const { Output(boost::str(format)); }
+        
+        static App* instance();
+        
+    protected:
+        
+        App();
+        
+        virtual ~App();
+        
+        void SetInstance(App *instance);
+        
+        virtual std::shared_ptr<ChatClientController> GetController() const = 0;
+        
+    private:
+        
+        static App *instance_;
+    };
+}
 #define APP App::instance()
 
 #endif /* App_h */

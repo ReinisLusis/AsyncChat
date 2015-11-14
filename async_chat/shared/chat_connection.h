@@ -15,47 +15,50 @@
 #include <queue>
 #include <boost/asio.hpp>
 
-class chat_connection : public std::enable_shared_from_this<chat_connection>
+namespace async_chat
 {
-public:
-    
-    virtual void start() = 0;
-    
-    void write(std::shared_ptr<chat_data_packet> packet);
-    
-    virtual void disconnect();
+    class ChatConnection : public std::enable_shared_from_this<ChatConnection>
+    {
+    public:
+        
+        virtual void Start() = 0;
+        
+        void Write(std::shared_ptr<ChatDataPacket> packet);
+        
+        virtual void Disconnect();
 
-    size_t queued_message_count() const { return write_queue_.size(); }
-    
-    virtual ~chat_connection();
+        size_t queued_message_count() const { return write_queue_.size(); }
+        
+        virtual ~ChatConnection();
 
-protected:
-    chat_connection(boost::asio::ip::tcp::socket socket);
-    
-    void read();
-    
-    virtual bool process_message(std::shared_ptr<chat_message> message) = 0;
-    
-    virtual void connection_closed() = 0;
-    
-    void on_error();
-    
-private:
-    enum class ReadState { Header, Body, Checksum };
-    
-    void write_internal();
-    
-    void read_handler(const boost::system::error_code& error, const size_t bytes_transferred);
-    
-    void write_handler(const boost::system::error_code& error, const size_t bytes_transferred);
-    
-    std::size_t completion_handler(const boost::system::error_code& error, std::size_t bytes_transferred);
-    
-    std::queue<std::shared_ptr<chat_data_packet>> write_queue_;
-    ReadState read_state_;
-    boost::asio::streambuf read_buffer_;
-    size_t body_size_;
-    boost::asio::ip::tcp::socket socket_;
-};
+    protected:
+        ChatConnection(boost::asio::ip::tcp::socket socket);
+        
+        void Read();
+        
+        virtual bool ProcessMessage(std::shared_ptr<ChatMessage> message) = 0;
+        
+        virtual void OnConnectionClosed() = 0;
+        
+        void OnError();
+        
+    private:
+        enum class ReadState { Header, Body, Checksum };
+        
+        void WriteInternal();
+        
+        void OnRead(const boost::system::error_code& error, const size_t bytes_transferred);
+        
+        void OnWrite(const boost::system::error_code& error, const size_t bytes_transferred);
+        
+        std::size_t OnCompletion(const boost::system::error_code& error, std::size_t bytes_transferred);
+        
+        std::queue<std::shared_ptr<ChatDataPacket>> write_queue_;
+        ReadState read_state_;
+        boost::asio::streambuf read_buffer_;
+        size_t body_size_;
+        boost::asio::ip::tcp::socket socket_;
+    };
+}
 
 #endif /* chat_connection_h */

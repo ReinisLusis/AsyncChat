@@ -3,7 +3,7 @@
 int main(int argc, char ** argv)
 {
     try {
-        ClientApp app(argc, argv);
+        async_chat::ClientApp app(argc, argv);
         return app.run();
     } catch( std::exception & e)
     {

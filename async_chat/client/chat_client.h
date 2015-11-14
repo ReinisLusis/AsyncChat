@@ -21,52 +21,53 @@
 #include <set>
 #include <boost/asio.hpp>
 
-class chat_client : public chat_client_controller
+namespace async_chat
 {
-public:
-    chat_client(boost::asio::io_service& io_service, const ClientOptions & options);
-    
-    virtual void ClientConnected(std::shared_ptr<chat_connection> client, const std::string & name) override;
-    
-    virtual void ClientDisconnected(std::shared_ptr<chat_connection> client, const std::string & name, bool inactivity) override;
-    
-    virtual void ClientError(std::shared_ptr<chat_connection> client, const std::string & name) override;
-    
-    virtual void WriteCompleted(std::shared_ptr<chat_connection> client) override;
-    
-    virtual void TimerExpired(std::shared_ptr<chat_connection> client, const std::string & name) override;
-    
-    virtual void TextReceived(std::shared_ptr<chat_connection> client, const std::string name, const std::string & text) override;
-    
-    virtual bool SusspendRead(std::shared_ptr<chat_connection> client) override;
-    
-    virtual void NotifySusspended(std::shared_ptr<chat_connection> client) override;
+    class ChatClient : public ChatClientController
+    {
+    public:
+        ChatClient(boost::asio::io_service& io_service, const ClientOptions & options);
+        
+        virtual void ClientConnected(std::shared_ptr<ChatConnection> client, const std::string & name) override;
+        
+        virtual void ClientDisconnected(std::shared_ptr<ChatConnection> client, const std::string & name, bool inactivity) override;
+        
+        virtual void ClientError(std::shared_ptr<ChatConnection> client, const std::string & name) override;
+        
+        virtual void WriteCompleted(std::shared_ptr<ChatConnection> client) override;
+        
+        virtual void TimerExpired(std::shared_ptr<ChatConnection> client, const std::string & name) override;
+        
+        virtual void TextReceived(std::shared_ptr<ChatConnection> client, const std::string name, const std::string & text) override;
+        
+        virtual bool SusspendRead(std::shared_ptr<ChatConnection> client) override;
+        
+        virtual void NotifySusspended(std::shared_ptr<ChatConnection> client) override;
 
-    void NameAlreadyInUse();
-    
-    void connect();
-    
-private:
-    void handle_connect(const boost::system::error_code& error);
-    
-    void on_connect_timeout(const boost::system::error_code& error);
-    
-    void on_reconnect_timer(const boost::system::error_code& error);
-    
-
-    
-    void reconnect();
-    
-    void on_signal(const boost::system::error_code& error, int signal_number);
-    
-    boost::asio::ip::tcp::socket socket_;
-    boost::asio::io_service& io_service_;
-    boost::asio::signal_set signal_set_;
-    boost::asio::deadline_timer connect_timer_;
-    boost::asio::deadline_timer reconnect_timer_;
-    const ClientOptions & options_;
-    std::shared_ptr<chat_client_connection> client_connection_;
-    std::shared_ptr<InputHandler> input_handler_;
-};
+        void NameAlreadyInUse();
+        
+        void Connect();
+        
+    private:
+        void OnConnect(const boost::system::error_code& error);
+        
+        void OnConnectTimer(const boost::system::error_code& error);
+        
+        void OnReconnectTimer(const boost::system::error_code& error);
+        
+        void Reconnect();
+        
+        void OnSignal(const boost::system::error_code& error, int signal_number);
+        
+        boost::asio::ip::tcp::socket socket_;
+        boost::asio::io_service& io_service_;
+        boost::asio::signal_set signal_set_;
+        boost::asio::deadline_timer connect_timer_;
+        boost::asio::deadline_timer reconnect_timer_;
+        const ClientOptions & options_;
+        std::shared_ptr<ChatClientConnection> client_connection_;
+        std::shared_ptr<InputHandler> input_handler_;
+    };
+}
 
 #endif /* chat_client_hpp */

@@ -8,22 +8,24 @@
 
 #include "server_app.h"
 
+namespace async_chat {
+    
 ServerApp::ServerApp(int argc, char ** argv)
 {
     options_result_ = options_.CreateOptions(argc, argv);
-    server_ = std::make_shared<chat_server>(io_service_, options_);
+    server_ = std::make_shared<ChatServer>(io_service_, options_);
 }
 
 int ServerApp::run()
 {
-    set_instance(this);
+    SetInstance(this);
     
     if (options_result_ != 0)
     {
         return options_result_;
     }
     
-    server_->accept();
+    server_->Accept();
     
     io_service_.run();
     
@@ -35,17 +37,19 @@ const ServerOptions & ServerApp::Options() const
     return options_;
 }
 
-std::shared_ptr<chat_server> ServerApp::controller()
+std::shared_ptr<ChatServer> ServerApp::controller()
 {
     return server_;
 }
 
 ServerApp::~ServerApp()
 {
-    set_instance(nullptr);
+    SetInstance(nullptr);
 }
 
-std::shared_ptr<chat_client_controller> ServerApp::get_controller() const
+std::shared_ptr<ChatClientController> ServerApp::GetController() const
 {
     return server_;
+}
+
 }

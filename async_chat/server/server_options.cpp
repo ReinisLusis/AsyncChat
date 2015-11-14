@@ -12,6 +12,8 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 
+namespace async_chat {
+    
 using boost::asio::ip::tcp;
 
 ServerOptions::ServerOptions()
@@ -86,3 +88,4 @@ int ServerOptions::ResumeReadTimerTimeoutSeconds() const
     return 2;
 }
 
+}

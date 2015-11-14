@@ -14,61 +14,64 @@
 #include "chat_message_client_notice.h"
 #include "chat_message_text2.h"
 
+namespace async_chat {
 using boost::asio::ip::tcp;
 
-chat_client_connection::chat_client_connection(boost::asio::io_service& io_service, const std::string & name, tcp::socket socket) :
-    chat_connection(std::move(socket)),
+ChatClientConnection::ChatClientConnection(boost::asio::io_service& io_service, const std::string & name, tcp::socket socket) :
+    ChatConnection(std::move(socket)),
     timer_(io_service),
     name_(name),
     connect_notice_sent_(false)
 {
 }
 
-void chat_client_connection::start()
+void ChatClientConnection::Start()
 {
-    APP->info("chat_client_connection::start()");
+    APP->Info("ChatClientConnection::Start()");
     
     if (!connect_notice_sent_)
     {
         connect_notice_sent_ = true;
-        write(chat_data_packet::Create(chat_message_client_notice(chat_message_client_notice::NoticeTypeEnum::Connected, name_)));
+        Write(ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::Connected, name_)));
         APP->controller()->ClientConnected(shared_from_this(), std::string());
     }
     
-    read();
+    Read();
 };
 
-bool chat_client_connection::process_message(std::shared_ptr<chat_message> message)
+bool ChatClientConnection::ProcessMessage(std::shared_ptr<ChatMessage> message)
 {
-    if (auto notice = std::dynamic_pointer_cast<chat_message_client_notice>(message))
+    if (auto notice = std::dynamic_pointer_cast<ChatMessageClientNotice>(message))
     {
-        if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Connected)
+        if (notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::Connected)
         {
             APP->controller()->ClientConnected(shared_from_this(), notice->Name());
         }
-        else if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::Disconnected || notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity)
+        else if (notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::Disconnected || notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::DisconnectedDueInactivity)
         {
-            APP->controller()->ClientDisconnected(shared_from_this(), notice->Name(), notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::DisconnectedDueInactivity);
+            APP->controller()->ClientDisconnected(shared_from_this(), notice->Name(), notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::DisconnectedDueInactivity);
         }
-        else if (notice->NoticeType() == chat_message_client_notice::NoticeTypeEnum::NameAlreadyInUse)
+        else if (notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::NameAlreadyInUse)
         {
             APP->controller()->NameAlreadyInUse();
         }
     }
-    else if (auto text = std::dynamic_pointer_cast<chat_message_text2>(message))
+    else if (auto text = std::dynamic_pointer_cast<ChatMessageText2>(message))
     {
         APP->controller()->TextReceived(shared_from_this(), text->Name(), text->Text());
     }
     else
     {
-        APP->info("chat_client_connection::process_message() unsupported message received");
+        APP->Info("ChatClientConnection::process_message() unsupported message received");
         return false;
     }
     
     return true;
 }
 
-void chat_client_connection::connection_closed()
+void ChatClientConnection::OnConnectionClosed()
 {
     APP->controller()->ClientDisconnected(shared_from_this(), std::string(), false);
+}
+    
 }
