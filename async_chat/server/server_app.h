@@ -9,7 +9,7 @@
 #ifndef server_app_h
 #define server_app_h
 
-#include "app.h"
+#include "../shared/app.h"
 
 #include "server_options.h"
 #include "chat_server.h"
