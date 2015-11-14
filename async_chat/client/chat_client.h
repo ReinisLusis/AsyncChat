@@ -11,14 +11,12 @@
 
 #include <stdio.h>
 
-#include "client_options.hpp"
+#include "../shared/chat_client_controller.h"
+#include "../shared/input_handler.h"
+#include "../messages/chat_data_packet.h"
 
-#include "chat_client_controller.h"
-#include "chat_data_packet.h"
-
+#include "client_options.h"
 #include "chat_client_connection.h"
-
-#include "input_handler.h"
 
 #include <set>
 #include <boost/asio.hpp>

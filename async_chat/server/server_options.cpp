@@ -6,7 +6,7 @@
 //  Copyright © 2015 Reinis. All rights reserved.
 //
 
-#include "server_options.hpp"
+#include "server_options.h"
 
 #include <cstdio>
 #include <iostream>

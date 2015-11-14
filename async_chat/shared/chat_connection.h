@@ -9,7 +9,7 @@
 #ifndef chat_connection_h
 #define chat_connection_h
 
-#include "chat_data_packet.h"
+#include "../messages/chat_data_packet.h"
 #include "chat_client_controller.h"
 
 #include <queue>

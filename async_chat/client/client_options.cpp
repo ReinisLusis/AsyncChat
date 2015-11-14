@@ -6,7 +6,7 @@
 //  Copyright © 2015 Reinis. All rights reserved.
 //
 
-#include "client_options.hpp"
+#include "client_options.h"
 
 #include <cstdio>
 #include <iostream>

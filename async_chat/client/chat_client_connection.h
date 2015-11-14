@@ -9,7 +9,7 @@
 #ifndef chat_client_connection_h
 #define chat_client_connection_h
 
-#include "chat_connection.h"
+#include "../shared/chat_connection.h"
 
 class chat_client_connection : public chat_connection
 {

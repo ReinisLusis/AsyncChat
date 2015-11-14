@@ -9,9 +9,9 @@
 #ifndef client_app_h
 #define client_app_h
 
-#include "app.h"
+#include "../shared/app.h"
 
-#include "client_options.hpp"
+#include "client_options.h"
 #include "chat_client.h"
 
 #include <boost/asio.hpp>

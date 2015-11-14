@@ -11,7 +11,7 @@
 
 #include "app.h"
 
-#include "server_options.hpp"
+#include "server_options.h"
 #include "chat_server.h"
 
 #include <boost/asio.hpp>
