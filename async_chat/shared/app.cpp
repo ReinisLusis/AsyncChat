@@ -9,7 +9,9 @@
 #include "app.h"
 
 #include <stdio.h>
+#include <fstream>
 #include <iostream>
+#include <sstream>
 
 namespace async_chat {
     
@@ -17,22 +19,30 @@ App *App::instance_ = nullptr;
 
 App::App()
 {
-    
 }
 
 App::~App()
 {
-    
 }
 
 void App::Info(const std::string & message) const
 {
-    std::cerr << message << std::endl;
+    try {
+        std::ofstream stream("chat_log.txt", std::ios::out | std::ios::app);
+        stream << message << std::endl;
+    } catch (...) {
+    }
 }
 
 void App::Error(const std::string & message) const
 {
     std::cerr << message << std::endl;
+    
+    try {
+        std::ofstream stream("chat_log.txt", std::ios::out | std::ios::app);
+        stream << message << std::endl;
+    } catch (...) {
+    }
 }
 
 std::shared_ptr<ChatClientController> App::controller() const
@@ -43,6 +53,12 @@ std::shared_ptr<ChatClientController> App::controller() const
 void App::Output(const std::string & message) const
 {
     std::cout << message << std::endl;
+    
+    try {
+        std::ofstream stream("chat_log.txt", std::ios::out | std::ios::app);
+        stream << message << std::endl;
+    } catch (...) {
+    }
 }
 
 App* App::instance()
