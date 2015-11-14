@@ -9,7 +9,7 @@
 #ifndef chat_server_connection_h
 #define chat_server_connection_h
 
-#include "chat_connection.h"
+#include "../shared/chat_connection.h"
 
 #include <boost/bind.hpp>
 

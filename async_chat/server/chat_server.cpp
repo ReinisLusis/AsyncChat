@@ -7,13 +7,13 @@
 //
 
 #include "server_app.h"
-
 #include "chat_server.h"
-
-#include "chat_connection.h"
-#include "chat_message_client_notice.h"
-#include "chat_message_text2.h"
 #include "chat_server_connection.h"
+
+#include "../shared/chat_connection.h"
+#include "../messages/chat_message_client_notice.h"
+#include "../messages/chat_message_text2.h"
+
 
 #include <boost/bind.hpp>
 

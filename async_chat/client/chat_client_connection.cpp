@@ -11,8 +11,8 @@
 #include "chat_client_connection.h"
 
 #include "chat_client.h"
-#include "chat_message_client_notice.h"
-#include "chat_message_text2.h"
+#include "../messages/chat_message_client_notice.h"
+#include "../messages/chat_message_text2.h"
 
 namespace async_chat {
 using boost::asio::ip::tcp;

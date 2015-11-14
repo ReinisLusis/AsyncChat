@@ -12,8 +12,8 @@
 #include <stdio.h>
 
 #include "server_options.h"
-#include "chat_client_controller.h"
-#include "chat_data_packet.h"
+#include "../shared/chat_client_controller.h"
+#include "../messages/chat_data_packet.h"
 
 #include <set>
 #include <boost/asio.hpp>

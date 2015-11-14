@@ -10,7 +10,7 @@
 
 #include "chat_client.h"
 
-#include "chat_message_text.h"
+#include "../messages/chat_message_text.h"
 
 #include <boost/bind.hpp>
 
