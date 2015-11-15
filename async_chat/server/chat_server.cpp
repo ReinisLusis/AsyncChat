@@ -47,6 +47,11 @@ void ChatServer::OnSignal(const boost::system::error_code& error, int signal_num
 
 void ChatServer::ClientConnected(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
+    if (clients_.find(client) == clients_.end())
+        return;
+    
+    APP->Info(boost::format("ChatServer::ClientConnected() %1%") % client->Endpoint());
+    
     if (client_names_.find(name) == client_names_.end())
     {
         client_names_.insert(name);
@@ -60,6 +65,9 @@ void ChatServer::ClientConnected(std::shared_ptr<ChatConnection> client, const s
 
 void ChatServer::ClientDisconnected(std::shared_ptr<ChatConnection> client, const std::string & name, bool inactivity)
 {
+    if (clients_.find(client) == clients_.end())
+        return;
+    
     RemoveClient(client, name);
     
     auto packet = ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::Disconnected, name));
@@ -68,16 +76,23 @@ void ChatServer::ClientDisconnected(std::shared_ptr<ChatConnection> client, cons
 
 void ChatServer::WriteCompleted(std::shared_ptr<ChatConnection> client)
 {
+    if (clients_.find(client) == clients_.end())
+        return;
+ 
+    APP->Info(boost::format("ChatServer::WriteCompleted() %1%") % client->Endpoint());
+    
     if (disconnect_on_write_completed_clients_.find(client) != disconnect_on_write_completed_clients_.end())
     {
-        client->Disconnect();
+        RemoveClient(client, std::string());
     }
 }
 
 void ChatServer::ClientError(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
+    if (clients_.find(client) == clients_.end())
+        return;
+    
     RemoveClient(client, name);
-    client->Disconnect();
     
     auto packet = ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::Disconnected, name));
     BroadcastPacket(packet, client);
@@ -85,6 +100,11 @@ void ChatServer::ClientError(std::shared_ptr<ChatConnection> client, const std::
 
 void ChatServer::TimerExpired(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
+    if (clients_.find(client) == clients_.end())
+        return;
+    
+    APP->Info(boost::format("ChatServer::TimerExpired() %1%") % client->Endpoint());
+    
     RemoveClient(client, name);
     client->Disconnect();
     
@@ -101,6 +121,7 @@ void ChatServer::RemoveClient(std::shared_ptr<ChatConnection> client, const std:
     susspended_clients_.erase(client);
     disconnect_on_write_completed_clients_.erase(client);
     clients_.erase(client);
+    client->Disconnect();
 }
 
 void ChatServer::TextReceived(std::shared_ptr<ChatConnection> client, const std::string name, const std::string & text)

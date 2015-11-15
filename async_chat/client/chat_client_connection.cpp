@@ -49,7 +49,10 @@ bool ChatClientConnection::ProcessMessage(std::shared_ptr<ChatMessage> message)
         }
         else if (notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::Disconnected || notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::DisconnectedDueInactivity)
         {
-            APP->controller()->ClientDisconnected(shared_from_this(), notice->Name(), notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::DisconnectedDueInactivity);
+            if (!notice->Name().empty())
+            {
+                APP->controller()->ClientDisconnected(shared_from_this(), notice->Name(), notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::DisconnectedDueInactivity);
+            }
         }
         else if (notice->NoticeType() == ChatMessageClientNotice::NoticeTypeEnum::NameAlreadyInUse)
         {

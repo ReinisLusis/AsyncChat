@@ -12,6 +12,7 @@
 
 #include <cstdio>
 #include <boost/bind.hpp>
+#include <boost/asio/write.hpp>
 
 namespace async_chat {
 using boost::asio::ip::tcp;
@@ -57,7 +58,8 @@ void ChatConnection::OnError()
 void ChatConnection::WriteInternal()
 {
     auto writeHandler = boost::bind(&ChatConnection::OnWrite, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
-    socket_.async_send(write_queue_.front()->Buffer(), writeHandler);
+    boost::asio::async_write(socket_, write_queue_.front()->Buffer(), writeHandler);
+    //socket_.async_send(write_queue_.front()->Buffer(), writeHandler);
 }
 
 void ChatConnection::OnRead(const boost::system::error_code& error, const size_t bytes_transferred)
@@ -131,6 +133,7 @@ void ChatConnection::OnRead(const boost::system::error_code& error, const size_t
 
 void ChatConnection::OnWrite(const boost::system::error_code& error, const size_t bytes_transferred)
 {
+    APP->Info(boost::format("ChatConnection::OnWrite() bytes_transferred: %1%") % bytes_transferred);
     if (error) {
         APP->Info(boost::format("ChatConnection::OnWrite() error: %1%") % boost::system::system_error(error).what());
         
@@ -199,4 +202,9 @@ ChatConnection::~ChatConnection()
 {
 }
 
+const boost::asio::ip::tcp::endpoint ChatConnection::Endpoint() const
+{
+    return socket_.remote_endpoint();
+}
+    
 }

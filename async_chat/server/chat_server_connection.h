@@ -28,6 +28,7 @@ namespace async_chat
         
         virtual void Disconnect() override;
         
+        virtual ~ChatServerConnection() override;
     protected:
         virtual bool ProcessMessage(std::shared_ptr<ChatMessage> message) override;
         virtual void OnConnectionClosed() override;

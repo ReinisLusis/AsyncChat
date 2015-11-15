@@ -29,6 +29,8 @@ namespace async_chat
 
         size_t queued_message_count() const { return write_queue_.size(); }
         
+        const boost::asio::ip::tcp::endpoint Endpoint() const;
+        
         virtual ~ChatConnection();
 
     protected:

@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-a localhost -p 12345 -n reinis"
+            argument = "-a 127.0.0.1 -p 12345 -n reinis"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

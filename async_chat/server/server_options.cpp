@@ -70,7 +70,7 @@ tcp::endpoint ServerOptions::Endpoint() const
 
 int ServerOptions::ClientInactivityTimeoutSeconds() const
 {
-    return 20;
+    return 10;
 }
 
 int ServerOptions::ClientMaxMessageCount() const

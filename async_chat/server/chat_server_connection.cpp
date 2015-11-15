@@ -22,6 +22,11 @@ ChatServerConnection::ChatServerConnection(boost::asio::io_service& io_service, 
 {
 }
 
+ChatServerConnection::~ChatServerConnection()
+{
+    APP->Info(boost::format("ChatServerConnection::~ChatServerConnection() %1%") % Name());
+}
+    
 void ChatServerConnection::Start()
 {
     SetTimer();
