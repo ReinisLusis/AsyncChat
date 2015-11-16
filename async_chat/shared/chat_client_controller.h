@@ -10,6 +10,7 @@
 #define chat_client_controller_h
 
 #include <string>
+#include <memory>
 
 namespace async_chat
 {
