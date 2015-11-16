@@ -61,7 +61,7 @@ namespace async_chat
         
         void OnSignal(const boost::system::error_code& error, int signal_number);
         
-        boost::asio::ip::tcp::socket socket_;
+        std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
         boost::asio::io_service& io_service_;
         boost::asio::signal_set signal_set_;
         boost::asio::deadline_timer connect_timer_;

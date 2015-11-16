@@ -16,7 +16,7 @@ namespace async_chat
     class ChatClientConnection : public ChatConnection
     {
     public:
-        ChatClientConnection(boost::asio::io_service& io_service, const std::string & name, boost::asio::ip::tcp::socket socket);
+        ChatClientConnection(boost::asio::io_service& io_service, const std::string & name, std::shared_ptr<boost::asio::ip::tcp::socket> socket);
         
         virtual void Start() override;
 

@@ -17,12 +17,13 @@
 namespace async_chat {
     
 ChatClient::ChatClient(boost::asio::io_service& io_service) :
-    socket_(io_service),
     signal_set_(io_service, SIGINT, SIGTERM),
     io_service_(io_service),
     connect_timer_(io_service),
     reconnect_timer_(io_service)
 {
+    socket_ = std::make_shared<boost::asio::ip::tcp::socket>(io_service);
+    
     auto signalHandler = std::bind(&ChatClient::OnSignal, this, std::placeholders::_1, std::placeholders::_2);
     signal_set_.async_wait(signalHandler);
 }
@@ -47,7 +48,7 @@ void ChatClient::Connect()
     connect_timer_.async_wait(connectTimeoutHandler);
     
     auto connectHandler = std::bind(&ChatClient::OnConnect, this, std::placeholders::_1);
-    socket_.async_connect(APP->Options().Endpoint(), connectHandler);
+    socket_->async_connect(APP->Options().Endpoint(), connectHandler);
 }
 
 void ChatClient::OnConnect(const boost::system::error_code& error)
@@ -61,7 +62,7 @@ void ChatClient::OnConnect(const boost::system::error_code& error)
     
     connect_timer_.cancel();
     
-    client_connection_ = std::make_shared<ChatClientConnection>(io_service_, APP->Options().Name(), std::move(socket_));
+    client_connection_ = std::make_shared<ChatClientConnection>(io_service_, APP->Options().Name(), socket_);
     client_connection_->Start();
 }
 
@@ -73,7 +74,7 @@ void ChatClient::OnConnectTimer(const boost::system::error_code& error)
     }
     
     APP->Info("ChatClient::OnConnectTimer() closing connection due to timeout");
-    socket_.close();
+    socket_->close();
 }
 
 void ChatClient::OnReconnectTimer(const boost::system::error_code& error)

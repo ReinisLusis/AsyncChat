@@ -23,7 +23,6 @@ ChatServer::ChatServer(boost::asio::io_service& io_service) :
     signal_set_(io_service, SIGINT, SIGTERM),
     acceptor_(io_service, APP->Options().Endpoint()),
     io_service_(io_service),
-    socket_(io_service),
     susspend_read_(false),
     resume_read_timer_(io_service)
 {
@@ -242,15 +241,17 @@ void ChatServer::ResumeRead()
 
 void ChatServer::Accept()
 {
+    socket_ = std::make_shared<boost::asio::ip::tcp::socket>(io_service_);
     auto acceptHandler = std::bind(&ChatServer::OnAccept, this, std::placeholders::_1);
-    acceptor_.async_accept(socket_, acceptHandler);
+    acceptor_.async_accept(*socket_, acceptHandler);
 }
 
 void ChatServer::OnAccept(const boost::system::error_code& error)
 {
     if (!error)
     {
-        auto client = std::make_shared<ChatServerConnection>(io_service_, std::move(socket_));
+        auto client = std::make_shared<ChatServerConnection>(io_service_, socket_);
+        socket_ = nullptr;
         clients_.insert(client);
         client->Start();
     }

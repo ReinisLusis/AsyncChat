@@ -34,7 +34,7 @@ namespace async_chat
         virtual ~ChatConnection();
 
     protected:
-        ChatConnection(boost::asio::ip::tcp::socket socket);
+        ChatConnection(std::shared_ptr<boost::asio::ip::tcp::socket> socket);
         
         void Read();
         
@@ -59,7 +59,7 @@ namespace async_chat
         ReadState read_state_;
         boost::asio::streambuf read_buffer_;
         size_t body_size_;
-        boost::asio::ip::tcp::socket socket_;
+        std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
     };
 }
 

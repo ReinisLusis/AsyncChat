@@ -60,7 +60,7 @@ namespace async_chat
         void ResumeRead();
         
         boost::asio::ip::tcp::acceptor acceptor_;
-        boost::asio::ip::tcp::socket socket_;
+        std::shared_ptr<boost::asio::ip::tcp::socket> socket_;
         boost::asio::signal_set signal_set_;
         boost::asio::io_service& io_service_;
         std::set<std::shared_ptr<ChatConnection>> clients_;

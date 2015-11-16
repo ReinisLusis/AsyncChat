@@ -17,8 +17,8 @@
 namespace async_chat {
 using boost::asio::ip::tcp;
 
-ChatClientConnection::ChatClientConnection(boost::asio::io_service& io_service, const std::string & name, tcp::socket socket) :
-    ChatConnection(std::move(socket)),
+ChatClientConnection::ChatClientConnection(boost::asio::io_service& io_service, const std::string & name, std::shared_ptr<tcp::socket> socket) :
+    ChatConnection(socket),
     timer_(io_service),
     name_(name),
     connect_notice_sent_(false)
