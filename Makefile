@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-std=gnu++11 -stdlib=libc++
+CFLAGS=-std=c++11
 LINKERFLAGS=-std=-L/usr/local/lib -l cryptopp -l boost_serialization -l boost_program_options -l boost_system
 TMP_PATH=async_chat/out
 
