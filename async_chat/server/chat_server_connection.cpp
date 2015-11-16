@@ -13,6 +13,8 @@
 #include "../messages/chat_message_text.h"
 #include "../messages/chat_message_client_notice.h"
 
+#include <functional>
+
 namespace async_chat {
     
 ChatServerConnection::ChatServerConnection(boost::asio::io_service& io_service, boost::asio::ip::tcp::socket socket) :
@@ -88,7 +90,7 @@ void ChatServerConnection::OnConnectionClosed()
 
 void ChatServerConnection::SetTimer()
 {
-    auto timerHandler = boost::bind(&ChatServerConnection::OnTimer, std::dynamic_pointer_cast<ChatServerConnection>(shared_from_this()), boost::asio::placeholders::error);
+    auto timerHandler = std::bind(&ChatServerConnection::OnTimer, std::dynamic_pointer_cast<ChatServerConnection>(shared_from_this()), std::placeholders::_1);
     timer_.expires_from_now(boost::posix_time::seconds(APP->Options().ClientInactivityTimeoutSeconds()));
     timer_.async_wait(timerHandler);
 }

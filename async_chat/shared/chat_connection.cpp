@@ -11,7 +11,7 @@
 #include "chat_connection.h"
 
 #include <cstdio>
-#include <boost/bind.hpp>
+#include <functional>
 #include <boost/asio/write.hpp>
 
 namespace async_chat {
@@ -45,8 +45,8 @@ ChatConnection::ChatConnection(tcp::socket socket) :
 
 void ChatConnection::Read()
 {
-    auto readHandler = boost::bind(&ChatConnection::OnRead, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
-    auto completionHandler = boost::bind(&ChatConnection::OnCompletion, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto readHandler = std::bind(&ChatConnection::OnRead, shared_from_this(), std::placeholders::_1, std::placeholders::_2);
+    auto completionHandler = std::bind(&ChatConnection::OnCompletion, shared_from_this(), std::placeholders::_1, std::placeholders::_2);
     boost::asio::async_read(socket_, read_buffer_, completionHandler, readHandler);
 }
 
@@ -57,7 +57,7 @@ void ChatConnection::OnError()
 
 void ChatConnection::WriteInternal()
 {
-    auto writeHandler = boost::bind(&ChatConnection::OnWrite, shared_from_this(), boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto writeHandler = std::bind(&ChatConnection::OnWrite, shared_from_this(), std::placeholders::_1, std::placeholders::_2);
     boost::asio::async_write(socket_, write_queue_.front()->Buffer(), writeHandler);
     //socket_.async_send(write_queue_.front()->Buffer(), writeHandler);
 }

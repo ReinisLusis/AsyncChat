@@ -11,8 +11,6 @@
 
 #include "../shared/chat_connection.h"
 
-#include <boost/bind.hpp>
-
 namespace async_chat
 {
     class ChatServerConnection : public ChatConnection

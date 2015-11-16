@@ -10,7 +10,7 @@
 
 #include "input_handler.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace async_chat {
     
@@ -22,7 +22,7 @@ InputHandler::InputHandler( boost::asio::io_service& io_service) : input_(io_ser
 
 void InputHandler::Read()
 {
-    auto readHandler = boost::bind(&InputHandler::OnRead, this, boost::asio::placeholders::error, boost::asio::placeholders::bytes_transferred);
+    auto readHandler = std::bind(&InputHandler::OnRead, this, std::placeholders::_1, std::placeholders::_2);
     boost::asio::async_read(input_, boost::asio::buffer(&command_, sizeof(command_)), readHandler);
 }
 

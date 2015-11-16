@@ -16,12 +16,13 @@ ClientApp::ClientApp(int argc, char ** argv) :
     options_(io_service_)
 {
     options_result_ = options_.CreateOptions(argc, argv);
-    client_ = std::make_shared<ChatClient>(io_service_);
 }
 
 int ClientApp::run()
 {
     SetInstance(this);
+    
+    client_ = std::make_shared<ChatClient>(io_service_);
     
     if (options_result_ != 0)
     {

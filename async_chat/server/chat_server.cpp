@@ -15,7 +15,7 @@
 #include "../messages/chat_message_text2.h"
 
 
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace async_chat {
     
@@ -27,7 +27,7 @@ ChatServer::ChatServer(boost::asio::io_service& io_service) :
     susspend_read_(false),
     resume_read_timer_(io_service)
 {
-    auto signalHandler = boost::bind(&ChatServer::OnSignal, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number);
+    auto signalHandler = std::bind(&ChatServer::OnSignal, this, std::placeholders::_1, std::placeholders::_2);
     signal_set_.async_wait(signalHandler);
 }
 
@@ -200,7 +200,7 @@ void ChatServer::OnResumeReadTimer(const boost::system::error_code& error)
         (total_queued_message_count / clients_.size() > APP->Options().AverageWriteQueueLengthPerClientBeforeSusspend()))
     {
         // keep susspended, just retriger timer
-        auto timerHandler = boost::bind(&ChatServer::OnResumeReadTimer, this, boost::asio::placeholders::error);
+        auto timerHandler = std::bind(&ChatServer::OnResumeReadTimer, this, std::placeholders::_1);
         resume_read_timer_.expires_from_now(boost::posix_time::seconds(APP->Options().ResumeReadTimerTimeoutSeconds()));
         resume_read_timer_.async_wait(timerHandler);
     }
@@ -216,7 +216,7 @@ void ChatServer::SusspendRead()
     {
         APP->Info("ChatServer::SusspendRead()");
     
-        auto timerHandler = boost::bind(&ChatServer::OnResumeReadTimer, this, boost::asio::placeholders::error);
+        auto timerHandler = std::bind(&ChatServer::OnResumeReadTimer, this, std::placeholders::_1);
         resume_read_timer_.expires_from_now(boost::posix_time::seconds(APP->Options().ResumeReadTimerTimeoutSeconds()));
         resume_read_timer_.async_wait(timerHandler);
         
@@ -242,7 +242,7 @@ void ChatServer::ResumeRead()
 
 void ChatServer::Accept()
 {
-    auto acceptHandler = boost::bind(&ChatServer::OnAccept, this, boost::asio::placeholders::error);
+    auto acceptHandler = std::bind(&ChatServer::OnAccept, this, std::placeholders::_1);
     acceptor_.async_accept(socket_, acceptHandler);
 }
 

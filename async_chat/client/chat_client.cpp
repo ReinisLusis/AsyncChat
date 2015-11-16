@@ -12,7 +12,7 @@
 
 #include "../messages/chat_message_text.h"
 
-#include <boost/bind.hpp>
+#include <functional>
 
 namespace async_chat {
     
@@ -23,7 +23,7 @@ ChatClient::ChatClient(boost::asio::io_service& io_service) :
     connect_timer_(io_service),
     reconnect_timer_(io_service)
 {
-    auto signalHandler = boost::bind(&ChatClient::OnSignal, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number);
+    auto signalHandler = std::bind(&ChatClient::OnSignal, this, std::placeholders::_1, std::placeholders::_2);
     signal_set_.async_wait(signalHandler);
 }
 
@@ -42,11 +42,11 @@ void ChatClient::Connect()
 {
     APP->Info(boost::format("ChatClient::Connect() endpoint: %1%") % APP->Options().Endpoint());
   
-    auto connectTimeoutHandler = boost::bind(&ChatClient::OnConnectTimer, this, boost::asio::placeholders::error);
+    auto connectTimeoutHandler = std::bind(&ChatClient::OnConnectTimer, this, std::placeholders::_1);
     connect_timer_.expires_from_now(boost::posix_time::milliseconds(APP->Options().ConnectTimeoutMilliseconds()));
     connect_timer_.async_wait(connectTimeoutHandler);
     
-    auto connectHandler = boost::bind(&ChatClient::OnConnect, this, boost::asio::placeholders::error);
+    auto connectHandler = std::bind(&ChatClient::OnConnect, this, std::placeholders::_1);
     socket_.async_connect(APP->Options().Endpoint(), connectHandler);
 }
 
@@ -90,7 +90,7 @@ void ChatClient::Reconnect()
 {
     APP->Info("ChatClient::Reconnect()");
     
-    auto reconnectHandler = boost::bind(&ChatClient::OnReconnectTimer, this, boost::asio::placeholders::error);
+    auto reconnectHandler = std::bind(&ChatClient::OnReconnectTimer, this, std::placeholders::_1);
     reconnect_timer_.expires_from_now(boost::posix_time::milliseconds(APP->Options().ReconnectWaitMilliseconds()));
     reconnect_timer_.async_wait(reconnectHandler);
 }
