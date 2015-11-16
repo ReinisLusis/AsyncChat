@@ -20,6 +20,7 @@
 
 #include <set>
 #include <boost/asio.hpp>
+#include <boost/asio/signal_set.hpp>
 
 namespace async_chat
 {
