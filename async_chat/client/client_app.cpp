@@ -15,8 +15,8 @@ namespace async_chat {
 ClientApp::ClientApp(int argc, char ** argv) :
     options_(io_service_)
 {
-    client_ = std::make_shared<ChatClient>(io_service_, options_);
     options_result_ = options_.CreateOptions(argc, argv);
+    client_ = std::make_shared<ChatClient>(io_service_);
 }
 
 int ClientApp::run()

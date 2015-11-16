@@ -13,7 +13,7 @@ namespace async_chat {
 ServerApp::ServerApp(int argc, char ** argv)
 {
     options_result_ = options_.CreateOptions(argc, argv);
-    server_ = std::make_shared<ChatServer>(io_service_, options_);
+    server_ = std::make_shared<ChatServer>(io_service_);
 }
 
 int ServerApp::run()

@@ -41,10 +41,10 @@ std::shared_ptr<ChatDataPacket> ChatDataPacket::Create(const ChatMessage & msg)
     boost::asio::streambuf msg_buf;
     std::ostream msg_stream(&msg_buf);
     boost::archive::xml_oarchive msg_archive(msg_stream);
-    msg_archive.template register_type<ChatMessage>();
-    msg_archive.template register_type<ChatMessageClientNotice>();
-    msg_archive.template register_type<ChatMessageText>();
-    msg_archive.template register_type<ChatMessageText2>();
+    msg_archive.register_type<ChatMessage>();
+    msg_archive.register_type<ChatMessageClientNotice>();
+    msg_archive.register_type<ChatMessageText>();
+    msg_archive.register_type<ChatMessageText2>();
     const ChatMessage * msg_p = &msg;
     msg_archive << boost::serialization::make_nvp("item", msg_p);
     
@@ -86,10 +86,10 @@ std::shared_ptr<ChatDataPacket> ChatDataPacket::Create(boost::asio::streambuf & 
 
     ChatMessage *message;
     boost::archive::xml_iarchive i(in);
-    i.template register_type<ChatMessage>();
-    i.template register_type<ChatMessageClientNotice>();
-    i.template register_type<ChatMessageText>();
-    i.template register_type<ChatMessageText2>();
+    i.register_type<ChatMessage>();
+    i.register_type<ChatMessageClientNotice>();
+    i.register_type<ChatMessageText>();
+    i.register_type<ChatMessageText2>();
     i >> boost::serialization::make_nvp("item", message);
     
     if (message == nullptr) {

@@ -33,7 +33,7 @@ void ChatClientConnection::Start()
     {
         connect_notice_sent_ = true;
         Write(ChatDataPacket::Create(ChatMessageClientNotice(ChatMessageClientNotice::NoticeTypeEnum::Connected, name_)));
-        APP->controller()->ClientConnected(shared_from_this(), std::string());
+        APP->controller()->StartInput();
     }
     
     Read();

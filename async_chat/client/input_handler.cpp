@@ -6,7 +6,7 @@
 //  Copyright © 2015 Reinis. All rights reserved.
 //
 
-#include "app.h"
+#include "client_app.h"
 
 #include "input_handler.h"
 
@@ -14,7 +14,7 @@
 
 namespace async_chat {
     
-InputHandler::InputHandler( boost::asio::io_service& io_service, ChatClientController &controller) : input_(io_service), controller_(controller)
+InputHandler::InputHandler( boost::asio::io_service& io_service) : input_(io_service)
 {
     input_.assign( STDIN_FILENO );
     Read();
@@ -39,7 +39,7 @@ void InputHandler::OnRead(const boost::system::error_code& error, const size_t b
         std::string str(boost::asio::buffers_begin(buf), boost::asio::buffers_end(buf));
         input_buffer_.consume(input_buffer_.size());
         
-        controller_.TextReceived(nullptr, std::string(), str);
+        APP->controller()->TextInput(str);
     }
     else
     {

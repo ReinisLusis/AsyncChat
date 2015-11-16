@@ -17,7 +17,7 @@ namespace async_chat
 {
     class InputHandler {
     public:
-        InputHandler(boost::asio::io_service& io_service, ChatClientController & controller);
+        InputHandler(boost::asio::io_service& io_service);
 
     private:
         void Read();
@@ -25,7 +25,6 @@ namespace async_chat
         
         boost::asio::streambuf input_buffer_;
         boost::asio::posix::stream_descriptor input_;
-        ChatClientController & controller_;
         char command_;
     };
 }

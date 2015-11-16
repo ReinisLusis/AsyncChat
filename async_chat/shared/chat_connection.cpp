@@ -52,7 +52,7 @@ void ChatConnection::Read()
 
 void ChatConnection::OnError()
 {
-    APP->controller()->ClientError(shared_from_this(), std::string());
+    APP->controller()->ClientError(shared_from_this());
 }
 
 void ChatConnection::WriteInternal()

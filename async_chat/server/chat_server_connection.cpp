@@ -83,7 +83,7 @@ bool ChatServerConnection::ProcessMessage(std::shared_ptr<ChatMessage> message)
 
 void ChatServerConnection::OnConnectionClosed()
 {
-    APP->controller()->ClientDisconnected(shared_from_this(), name_, false);
+    APP->controller()->ClientDisconnected(shared_from_this(), name_);
 }
 
 void ChatServerConnection::SetTimer()

@@ -23,25 +23,24 @@ namespace async_chat
     class ChatServer : public ChatClientController
     {
     public:
-        ChatServer(boost::asio::io_service& io_service, const ServerOptions & options);
+        ChatServer(boost::asio::io_service& io_service);
         
-        virtual void ClientConnected(std::shared_ptr<ChatConnection> client, const std::string & name) override;
-        
-        virtual void ClientDisconnected(std::shared_ptr<ChatConnection> client, const std::string & name, bool inactivity) override;
-        
-        virtual void ClientError(std::shared_ptr<ChatConnection> client, const std::string & name) override;
+
+        virtual void ClientError(std::shared_ptr<ChatConnection> client) override;
         
         virtual void WriteCompleted(std::shared_ptr<ChatConnection> client) override;
-        
-        virtual void TimerExpired(std::shared_ptr<ChatConnection> client, const std::string & name) override;
-        
-        virtual void TextReceived(std::shared_ptr<ChatConnection> client, const std::string name, const std::string & text) override;
         
         virtual bool SusspendRead(std::shared_ptr<ChatConnection> client) override;
         
         virtual void NotifySusspended(std::shared_ptr<ChatConnection> client) override;
-
-        inline const ServerOptions& Options() const { return options_; }
+        
+        void TimerExpired(std::shared_ptr<ChatConnection> client, const std::string & name);
+        
+        void ClientConnected(std::shared_ptr<ChatConnection> client, const std::string & name);
+        
+        void ClientDisconnected(std::shared_ptr<ChatConnection> client, const std::string & name);
+        
+        void TextReceived(std::shared_ptr<ChatConnection> client, const std::string name, const std::string & text);
 
         void Accept();
         
@@ -68,7 +67,6 @@ namespace async_chat
         std::set<std::shared_ptr<ChatConnection>> susspended_clients_;
         std::set<std::string> client_names_;
         std::set<std::shared_ptr<ChatConnection>> disconnect_on_write_completed_clients_;
-        const ServerOptions & options_;
         bool susspend_read_;
         boost::asio::deadline_timer resume_read_timer_;
     };

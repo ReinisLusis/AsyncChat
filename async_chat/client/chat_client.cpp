@@ -16,13 +16,12 @@
 
 namespace async_chat {
     
-ChatClient::ChatClient(boost::asio::io_service& io_service, const ClientOptions & options) :
+ChatClient::ChatClient(boost::asio::io_service& io_service) :
     socket_(io_service),
     signal_set_(io_service, SIGINT, SIGTERM),
     io_service_(io_service),
     connect_timer_(io_service),
-    reconnect_timer_(io_service),
-    options_(options)
+    reconnect_timer_(io_service)
 {
     auto signalHandler = boost::bind(&ChatClient::OnSignal, this, boost::asio::placeholders::error, boost::asio::placeholders::signal_number);
     signal_set_.async_wait(signalHandler);
@@ -41,14 +40,14 @@ void ChatClient::OnSignal(const boost::system::error_code& error, int signal_num
 
 void ChatClient::Connect()
 {
-    APP->Info(boost::format("ChatClient::Connect() endpoint: %1%") % options_.Endpoint());
+    APP->Info(boost::format("ChatClient::Connect() endpoint: %1%") % APP->Options().Endpoint());
   
     auto connectTimeoutHandler = boost::bind(&ChatClient::OnConnectTimer, this, boost::asio::placeholders::error);
-    connect_timer_.expires_from_now(boost::posix_time::milliseconds(options_.ConnectTimeoutMilliseconds()));
+    connect_timer_.expires_from_now(boost::posix_time::milliseconds(APP->Options().ConnectTimeoutMilliseconds()));
     connect_timer_.async_wait(connectTimeoutHandler);
     
     auto connectHandler = boost::bind(&ChatClient::OnConnect, this, boost::asio::placeholders::error);
-    socket_.async_connect(options_.Endpoint(), connectHandler);
+    socket_.async_connect(APP->Options().Endpoint(), connectHandler);
 }
 
 void ChatClient::OnConnect(const boost::system::error_code& error)
@@ -62,7 +61,7 @@ void ChatClient::OnConnect(const boost::system::error_code& error)
     
     connect_timer_.cancel();
     
-    client_connection_ = std::make_shared<ChatClientConnection>(io_service_, options_.Name(), std::move(socket_));
+    client_connection_ = std::make_shared<ChatClientConnection>(io_service_, APP->Options().Name(), std::move(socket_));
     client_connection_->Start();
 }
 
@@ -92,20 +91,13 @@ void ChatClient::Reconnect()
     APP->Info("ChatClient::Reconnect()");
     
     auto reconnectHandler = boost::bind(&ChatClient::OnReconnectTimer, this, boost::asio::placeholders::error);
-    reconnect_timer_.expires_from_now(boost::posix_time::milliseconds(options_.ReconnectWaitMilliseconds()));
+    reconnect_timer_.expires_from_now(boost::posix_time::milliseconds(APP->Options().ReconnectWaitMilliseconds()));
     reconnect_timer_.async_wait(reconnectHandler);
 }
 
 void ChatClient::ClientConnected(std::shared_ptr<ChatConnection> client, const std::string & name)
 {
-    if (!name.empty())
-    {
-        APP->Output(boost::format("%1% joined chat") % name);
-    }
-    else
-    {
-        input_handler_ = std::make_shared<InputHandler>(io_service_, *this);
-    }
+    APP->Output(boost::format("%1% joined chat") % name);
 }
 
 void ChatClient::ClientDisconnected(std::shared_ptr<ChatConnection> client, const std::string & name, bool inactivity)
@@ -126,33 +118,31 @@ void ChatClient::ClientDisconnected(std::shared_ptr<ChatConnection> client, cons
         io_service_.stop();
     }
 }
-
-void ChatClient::ClientError(std::shared_ptr<ChatConnection> client, const std::string & name)
+    
+void ChatClient::StartInput()
 {
+    input_handler_ = std::make_shared<InputHandler>(io_service_);
 }
 
-void ChatClient::TimerExpired(std::shared_ptr<ChatConnection> client, const std::string & name)
+void ChatClient::ClientError(std::shared_ptr<ChatConnection> client)
 {
+    client_connection_->Disconnect();
+    io_service_.stop();
 }
 
 void ChatClient::TextReceived(std::shared_ptr<ChatConnection> client, const std::string name, const std::string & text)
 {
-    if (client == nullptr)
-    {
-        if (client_connection_ != nullptr)
-        {
-            client_connection_->Write(ChatDataPacket::Create(ChatMessageText(text)));
-        }
-    }
-    else
-    {
-        APP->Output(boost::format("%1% : %2%") % name % text);
-    }
+    APP->Output(boost::format("%1% : %2%") % name % text);
+}
+    
+void ChatClient::TextInput(const std::string & text)
+{
+    client_connection_->Write(ChatDataPacket::Create(ChatMessageText(text)));
 }
 
 void ChatClient::NameAlreadyInUse()
 {
-    APP->Output(boost::format("Nickname %1% is already taken") % options_.Name());
+    APP->Output(boost::format("Nickname %1% is already taken") % APP->Options().Name());
 }
 
 bool ChatClient::SusspendRead(std::shared_ptr<ChatConnection> client)
