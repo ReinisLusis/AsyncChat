@@ -27,16 +27,16 @@ messages: async_chat/messages/chat_message.cpp async_chat/messages/chat_message_
 	$(CC) $(CFLAGS) -c async_chat/messages/chat_message_text2.cpp -o $(TMP_PATH)/chat_message_text2.o
 	$(CC) $(CFLAGS) -c async_chat/messages/chat_data_packet.cpp -o $(TMP_PATH)/chat_data_packet.o
 	
-shared: async_chat/shared/app.cpp async_chat/shared/chat_connection.cpp async_chat/shared/input_handler.cpp
+shared: async_chat/shared/app.cpp async_chat/shared/chat_connection.cpp
 	$(CC) $(CFLAGS) -c async_chat/shared/app.cpp -o $(TMP_PATH)/app.o
-	$(CC) $(CFLAGS) -c async_chat/shared/chat_connection.cpp -o $(TMP_PATH)/chat_connection.o
-	$(CC) $(CFLAGS) -c async_chat/shared/input_handler.cpp -o $(TMP_PATH)/input_handler.o
+	$(CC) $(CFLAGS) -c async_chat/shared/chat_connection.cpp -o $(TMP_PATH)/chat_connection.o	
 	
-client: async_chat/client/client_options.cpp async_chat/client/chat_client_connection.cpp async_chat/client/client_app.cpp async_chat/client/chat_client.cpp
+client: async_chat/client/client_options.cpp async_chat/client/chat_client_connection.cpp async_chat/client/client_app.cpp async_chat/client/chat_client.cpp async_chat/client/input_handler.cpp
 	$(CC) $(CFLAGS) -c async_chat/client/client_options.cpp -o $(TMP_PATH)/client_options.o
 	$(CC) $(CFLAGS) -c async_chat/client/chat_client_connection.cpp -o $(TMP_PATH)/chat_client_connection.o
 	$(CC) $(CFLAGS) -c async_chat/client/client_app.cpp -o $(TMP_PATH)/client_app.o
 	$(CC) $(CFLAGS) -c async_chat/client/chat_client.cpp -o $(TMP_PATH)/chat_client.o
+	$(CC) $(CFLAGS) -c async_chat/client/input_handler.cpp -o $(TMP_PATH)/input_handler.o
 	
 server: async_chat/server/server_options.cpp async_chat/server/chat_server_connection.cpp async_chat/server/server_app.cpp async_chat/server/chat_server.cpp
 	$(CC) $(CFLAGS) -c async_chat/server/server_options.cpp -o $(TMP_PATH)/server_options.o

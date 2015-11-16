@@ -9,8 +9,6 @@
 #ifndef input_handler_h
 #define input_handler_h
 
-#include "chat_client_controller.h"
-
 #include <boost/asio.hpp>
 
 namespace async_chat
